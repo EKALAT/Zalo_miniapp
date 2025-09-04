@@ -1,52 +1,42 @@
 [
   {
     "id": 1,
-    "name": "Mẹ bầu",
-    "image": "https://stc-zmp.zadn.vn/zaui-fashion/category/ao-len.webp"
+    "name": "Chống muỗi & Côn trùng",
+    "image": "https://theci.vn/wp-content/uploads/2023/05/theci-xit-duoi-muoi-va-con-trung-cho-tre-va-gia-dinh.png"
   },
   {
     "id": 2,
-    "name": "Bé sơ sinh",
-    "image": "https://stc-zmp.zadn.vn/zaui-fashion/category/blazer.webp"
+    "name": "Chăm sóc da bé",
+    "image": "https://theci.vn/wp-content/uploads/2024/06/vn-11134207-7r98o-lw72dv5sb8wrb1-e1718261536855.jpg"
   },
   {
     "id": 3,
-    "name": "Bé 1-3 tuổi",
-    "image": "https://stc-zmp.zadn.vn/zaui-fashion/category/dam.webp"
+    "name": "Vệ sinh răng miệng",
+    "image": "https://theci.vn/wp-content/uploads/2024/07/Keyvisual-xit-rang-mieng-01-scaled.jpg"
   },
   {
     "id": 4,
-    "name": "Bé 4-6 tuổi",
-    "image": "https://stc-zmp.zadn.vn/zaui-fashion/category/ao-phong.webp"
+    "name": "Tắm gội cho bé",
+    "image": "https://mevabesukids.com/wp-content/uploads/sites/389/2024/08/Tam-goi-theCi.jpg"
   },
   {
     "id": 5,
-    "name": "Sữa & Dinh dưỡng",
-    "image": "https://stc-zmp.zadn.vn/zaui-fashion/category/ao-gile.webp"
+    "name": "Vệ sinh cá nhân",
+    "image": "https://bizweb.dktcdn.net/thumb/grande/100/482/360/products/dung-dich-ve-sinh-be-gai-theci-140ml.png?v=1739260804223"
   },
   {
     "id": 6,
-    "name": "Tã & Bỉm",
-    "image": "https://stc-zmp.zadn.vn/zaui-fashion/category/chan-vay.webp"
+    "name": "Khăn giấy & Vệ sinh",
+    "image": "https://theci.vn/wp-content/uploads/2025/05/z6653746987913_2ab089f48a053eacd88562c7f994c6e6-1536x1536.jpg"
   },
   {
     "id": 7,
-    "name": "Đồ chơi giáo dục",
-    "image": "https://stc-zmp.zadn.vn/zaui-fashion/category/quan-short.webp"
+    "name": "Tinh dầu & Thảo dược",
+    "image": "https://theci.vn/wp-content/uploads/2024/02/428625153_298355633263862_480882860634396409_n.jpg"
   },
   {
     "id": 8,
-    "name": "Chăm sóc da bé",
-    "image": "https://stc-zmp.zadn.vn/zaui-fashion/category/quan-jean.webp"
-  },
-  {
-    "id": 9,
-    "name": "Đồ dùng mẹ & bé",
-    "image": "https://stc-zmp.zadn.vn/zaui-fashion/category/tui-xach.webp"
-  },
-  {
-    "id": 10,
-    "name": "Thời trang bé",
-    "image": "https://stc-zmp.zadn.vn/zaui-fashion/category/phu-kien.webp"
+    "name": "Nước hoa & Mùi hương",
+    "image": "https://theci.vn/wp-content/uploads/2025/03/Nuoc-Hoa-Cho-Be-Theci-2048x2048.png"
   }
 ]
