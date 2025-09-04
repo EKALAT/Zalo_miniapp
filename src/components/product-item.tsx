@@ -1,4 +1,4 @@
-import { Product } from "types";
+import { Product } from "@/types";
 import { formatPrice } from "@/utils/format";
 import TransitionLink from "./transition-link";
 import { useState } from "react";
@@ -17,35 +17,53 @@ export default function ProductItem(props: ProductItemProps) {
 
   return (
     <TransitionLink
-      className="flex flex-col cursor-pointer group"
+      className="flex flex-col cursor-pointer group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02]"
       to={`/product/${props.product.id}`}
       replace={props.replace}
       onClick={() => setSelected(true)}
     >
       {({ isTransitioning }) => (
         <>
-          <img
-            src={props.product.image}
-            className="w-full aspect-square object-cover rounded-t-lg"
-            style={{
-              viewTransitionName:
-                isTransitioning && selected // only animate the "clicked" product item in related products list
-                  ? `product-image-${props.product.id}`
-                  : undefined,
-            }}
-            alt={props.product.name}
-          />
-          <div className="py-2">
-            <div className="text-3xs text-subtitle truncate">
+          <div className="relative overflow-hidden rounded-t-lg">
+            <img
+              src={props.product.image}
+              className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-200"
+              style={{
+                viewTransitionName:
+                  isTransitioning && selected // only animate the "clicked" product item in related products list
+                    ? `product-image-${props.product.id}`
+                    : undefined,
+              }}
+              alt={props.product.name}
+            />
+            <div className="absolute top-2 right-2 bg-primary text-white text-2xs px-2 py-1 rounded-full font-medium">
               {props.product.category.name}
             </div>
-            <div className="text-xs h-9 line-clamp-2">{props.product.name}</div>
-            <div className="mt-0.5 text-sm font-medium">
+          </div>
+          <div className="p-3">
+            <div className="text-xs h-9 line-clamp-2 font-medium text-foreground mb-2 leading-tight">
+              {props.product.name}
+            </div>
+            <div className="text-sm font-bold text-primary mb-2">
               {formatPrice(props.product.price)}
             </div>
-            <div className="text-3xs text-subtitle line-through">
-              {formatPrice(props.product.price)}
-            </div>
+            {props.product.colors && props.product.colors.length > 0 && (
+              <div className="flex space-x-1 mb-2">
+                {props.product.colors.slice(0, 4).map((color, index) => (
+                  <div
+                    key={index}
+                    className="w-4 h-4 rounded-full border border-gray-200"
+                    style={{ backgroundColor: color.hex }}
+                    title={color.name}
+                  />
+                ))}
+              </div>
+            )}
+            {props.product.sizes && props.product.sizes.length > 0 && (
+              <div className="text-3xs text-subtitle">
+                Size: {props.product.sizes.join(", ")}
+              </div>
+            )}
           </div>
         </>
       )}

@@ -3,8 +3,17 @@
   user-select: none;
 }
 
+body {
+  font-family: "Signika", cursive;
+}
+
+/* Font cho header title */
+.header-title {
+  font-family: 'lobster', cursive !important;
+}
+
 .toast-container {
-  > div > div {
+  >div>div {
     padding: 12px 16px;
     background-color: #212121;
     color: #FFFFFFF2;
@@ -12,7 +21,7 @@
   }
 }
 
-.zaui-sheet{
+.zaui-sheet {
   .zaui-sheet-content {
     min-height: unset;
   }

@@ -27,6 +27,13 @@ module.exports = {
         lg: ["16px", "22px"],
         xl: ["18px", "24px"],
       },
+      fontFamily: {
+        lobster: ["Lobster", "cursive"],
+        Pacifico: ["Pacifico", "cursive"],
+        Signika: ["Signika", "cursive"],
+        // thêm dòng này để dùng Google Font Lobster
+      },
     },
   },
+  plugins: [],
 };

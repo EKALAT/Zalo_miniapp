@@ -2,308 +2,282 @@
   {
     "id": 1,
     "categoryId": 1,
-    "name": "Light brown knit sweater",
-    "price": 189000,
+    "name": "Áo bầu cotton co giãn",
+    "price": 350000,
     "image": "https://stc-zmp.zadn.vn/zaui-fashion/home/product-1.webp",
     "details": [
       {
         "title": "Mô tả sản phẩm",
-        "content": "Với công nghệ DRY, Cool Touch, tính năng hút ẩm và khử mùi tiện nghi.\n- Chất thun co giãn mịn.\n- Viền sau mềm mại và mịn màng.\n- Vừa vặn thoải mái.\n- Được thiết kế không có dải lót ở phía sau để mang lại vẻ ngoài bóng bẩy.\n- Hỗ trợ toàn diện đảm bảo cúp luôn ở đúng vị trí.\n\n**Chiều rộng dây đeo vai khác nhau tùy theo kích cỡ."
+        "content": "Áo bầu chất liệu cotton 100% co giãn, thoải mái cho mẹ bầu trong suốt thai kỳ. Thiết kế đẹp, dễ mặc và dễ giặt."
       },
       {
         "title": "Chất liệu / Cách bảo quản",
-        "content": "Với công nghệ DRY, Cool Touch, tính năng hút ẩm và khử mùi tiện nghi.\n- Chất thun co giãn mịn.\n- Viền sau mềm mại và mịn màng.\n- Vừa vặn thoải mái.\n- Được thiết kế không có dải lót ở phía sau để mang lại vẻ ngoài bóng bẩy.\n- Hỗ trợ toàn diện đảm bảo cúp luôn ở đúng vị trí.\n\n**Chiều rộng dây đeo vai khác nhau tùy theo kích cỡ."
+        "content": "Chất liệu: Cotton 100% co giãn\nCách bảo quản: Giặt máy ở nhiệt độ 30°C, không sử dụng chất tẩy mạnh."
       },
       {
         "title": "Hướng dẫn sử dụng",
-        "content": "Với công nghệ DRY, Cool Touch, tính năng hút ẩm và khử mùi tiện nghi.\n- Chất thun co giãn mịn.\n- Viền sau mềm mại và mịn màng.\n- Vừa vặn thoải mái.\n- Được thiết kế không có dải lót ở phía sau để mang lại vẻ ngoài bóng bẩy.\n- Hỗ trợ toàn diện đảm bảo cúp luôn ở đúng vị trí.\n\n**Chiều rộng dây đeo vai khác nhau tùy theo kích cỡ."
+        "content": "Mặc trực tiếp, phù hợp cho mẹ bầu từ tháng thứ 3 trở đi. Có thể mặc trong nhà hoặc ra ngoài."
       }
     ],
-    "sizes": ["S", "M", "L", "XL"],
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
     "colors": [
       {
-        "name": "Đỏ",
-        "hex": "#FFC7C7"
+        "name": "Xanh dương",
+        "hex": "#2563EB"
       },
       {
-        "name": "Xanh dương",
-        "hex": "#DBEBFF"
+        "name": "Hồng nhạt",
+        "hex": "#F472B6"
       },
       {
         "name": "Xanh lá",
-        "hex": "#D1F0DB"
+        "hex": "#10B981"
       },
       {
-        "name": "Xám",
-        "hex": "#D9E2ED"
+        "name": "Trắng",
+        "hex": "#FFFFFF"
       }
     ]
   },
   {
     "id": 2,
-    "categoryId": 1,
-    "name": "Beige oversized sweater",
-    "price": 189000,
-    "originalPrice": 300000,
+    "categoryId": 2,
+    "name": "Bộ quần áo sơ sinh cotton 100%",
+    "price": 120000,
     "image": "https://stc-zmp.zadn.vn/zaui-fashion/home/product-2.webp",
     "details": [
       {
         "title": "Mô tả sản phẩm",
-        "content": "Với công nghệ DRY, Cool Touch, tính năng hút ẩm và khử mùi tiện nghi.\n- Chất thun co giãn mịn.\n- Viền sau mềm mại và mịn màng.\n- Vừa vặn thoải mái.\n- Được thiết kế không có dải lót ở phía sau để mang lại vẻ ngoài bóng bẩy.\n- Hỗ trợ toàn diện đảm bảo cúp luôn ở đúng vị trí.\n\n**Chiều rộng dây đeo vai khác nhau tùy theo kích cỡ."
+        "content": "Bộ quần áo sơ sinh chất liệu cotton 100%, thoáng mát, không gây kích ứng da. Thiết kế dễ mặc, dễ thay cho bé."
       },
       {
         "title": "Chất liệu / Cách bảo quản",
-        "content": "Với công nghệ DRY, Cool Touch, tính năng hút ẩm và khử mùi tiện nghi.\n- Chất thun co giãn mịn.\n- Viền sau mềm mại và mịn màng.\n- Vừa vặn thoải mái.\n- Được thiết kế không có dải lót ở phía sau để mang lại vẻ ngoài bóng bẩy.\n- Hỗ trợ toàn diện đảm bảo cúp luôn ở đúng vị trí.\n\n**Chiều rộng dây đeo vai khác nhau tùy theo kích cỡ."
+        "content": "Chất liệu: Cotton 100% mềm mại\nCách bảo quản: Giặt tay hoặc máy nhẹ, phơi nơi thoáng mát."
       },
       {
         "title": "Hướng dẫn sử dụng",
-        "content": "Với công nghệ DRY, Cool Touch, tính năng hút ẩm và khử mùi tiện nghi.\n- Chất thun co giãn mịn.\n- Viền sau mềm mại và mịn màng.\n- Vừa vặn thoải mái.\n- Được thiết kế không có dải lót ở phía sau để mang lại vẻ ngoài bóng bẩy.\n- Hỗ trợ toàn diện đảm bảo cúp luôn ở đúng vị trí.\n\n**Chiều rộng dây đeo vai khác nhau tùy theo kích cỡ."
+        "content": "Phù hợp cho bé từ 0-6 tháng tuổi. Mặc trực tiếp, có thể mặc trong nhà hoặc ra ngoài."
+      }
+    ],
+    "sizes": [
+      "0-3M",
+      "3-6M",
+      "6-9M"
+    ],
+    "colors": [
+      {
+        "name": "Xanh dương",
+        "hex": "#2563EB"
+      },
+      {
+        "name": "Hồng nhạt",
+        "hex": "#F472B6"
+      },
+      {
+        "name": "Vàng",
+        "hex": "#F59E0B"
+      },
+      {
+        "name": "Trắng",
+        "hex": "#FFFFFF"
       }
     ]
   },
   {
     "id": 3,
-    "categoryId": 1,
-    "name": "Brown casual sweater",
-    "price": 189000,
-    "originalPrice": 300000,
+    "categoryId": 5,
+    "name": "Sữa bột Similac 1+ (900g)",
+    "price": 450000,
     "image": "https://stc-zmp.zadn.vn/zaui-fashion/home/product-3.webp",
     "details": [
       {
         "title": "Mô tả sản phẩm",
-        "content": "Với công nghệ DRY, Cool Touch, tính năng hút ẩm và khử mùi tiện nghi.\n- Chất thun co giãn mịn.\n- Viền sau mềm mại và mịn màng.\n- Vừa vặn thoải mái.\n- Được thiết kế không có dải lót ở phía sau để mang lại vẻ ngoài bóng bẩy.\n- Hỗ trợ toàn diện đảm bảo cúp luôn ở đúng vị trí.\n\n**Chiều rộng dây đeo vai khác nhau tùy theo kích cỡ."
+        "content": "Sữa bột dinh dưỡng cho bé từ 1 tuổi trở lên, giàu DHA, ARA và các vitamin thiết yếu giúp bé phát triển toàn diện."
       },
       {
-        "title": "Chất liệu / Cách bảo quản",
-        "content": "Với công nghệ DRY, Cool Touch, tính năng hút ẩm và khử mùi tiện nghi.\n- Chất thun co giãn mịn.\n- Viền sau mềm mại và mịn màng.\n- Vừa vặn thoải mái.\n- Được thiết kế không có dải lót ở phía sau để mang lại vẻ ngoài bóng bẩy.\n- Hỗ trợ toàn diện đảm bảo cúp luôn ở đúng vị trí.\n\n**Chiều rộng dây đeo vai khác nhau tùy theo kích cỡ."
+        "title": "Thành phần dinh dưỡng",
+        "content": "Chứa DHA, ARA, Prebiotics, Vitamin A, C, D, E, K, các khoáng chất thiết yếu như Canxi, Sắt, Kẽm."
       },
       {
         "title": "Hướng dẫn sử dụng",
-        "content": "Với công nghệ DRY, Cool Touch, tính năng hút ẩm và khử mùi tiện nghi.\n- Chất thun co giãn mịn.\n- Viền sau mềm mại và mịn màng.\n- Vừa vặn thoải mái.\n- Được thiết kế không có dải lót ở phía sau để mang lại vẻ ngoài bóng bẩy.\n- Hỗ trợ toàn diện đảm bảo cúp luôn ở đúng vị trí.\n\n**Chiều rộng dây đeo vai khác nhau tùy theo kích cỡ."
+        "content": "Pha 1 muỗng gạt với 60ml nước ấm 40°C. Lắc đều cho đến khi tan hoàn toàn. Sử dụng ngay sau khi pha."
       }
     ],
-    "sizes": ["S", "M", "L", "XL"],
+    "sizes": [
+      "900g"
+    ],
     "colors": [
       {
-        "name": "Đỏ",
-        "hex": "#FFC7C7"
-      },
-      {
-        "name": "Xanh dương",
-        "hex": "#DBEBFF"
-      },
-      {
-        "name": "Xanh lá",
-        "hex": "#D1F0DB"
-      },
-      {
-        "name": "Xám",
-        "hex": "#D9E2ED"
+        "name": "Trắng",
+        "hex": "#FFFFFF"
       }
     ]
   },
   {
     "id": 4,
-    "categoryId": 1,
-    "name": "Dark brown crew neck sweater",
-    "price": 189000,
-    "originalPrice": 300000,
+    "categoryId": 6,
+    "name": "Tã Huggies Size M (54 miếng)",
+    "price": 280000,
     "image": "https://stc-zmp.zadn.vn/zaui-fashion/home/product-4.webp",
     "details": [
       {
         "title": "Mô tả sản phẩm",
-        "content": "Với công nghệ DRY, Cool Touch, tính năng hút ẩm và khử mùi tiện nghi.\n- Chất thun co giãn mịn.\n- Viền sau mềm mại và mịn màng.\n- Vừa vặn thoải mái.\n- Được thiết kế không có dải lót ở phía sau để mang lại vẻ ngoài bóng bẩy.\n- Hỗ trợ toàn diện đảm bảo cúp luôn ở đúng vị trí.\n\n**Chiều rộng dây đeo vai khác nhau tùy theo kích cỡ."
+        "content": "Tã dán cao cấp, thấm hút tốt, mềm mại cho làn da nhạy cảm của bé. Thiết kế chống tràn, giữ khô ráo suốt đêm."
       },
       {
-        "title": "Chất liệu / Cách bảo quản",
-        "content": "Với công nghệ DRY, Cool Touch, tính năng hút ẩm và khử mùi tiện nghi.\n- Chất thun co giãn mịn.\n- Viền sau mềm mại và mịn màng.\n- Vừa vặn thoải mái.\n- Được thiết kế không có dải lót ở phía sau để mang lại vẻ ngoài bóng bẩy.\n- Hỗ trợ toàn diện đảm bảo cúp luôn ở đúng vị trí.\n\n**Chiều rộng dây đeo vai khác nhau tùy theo kích cỡ."
+        "title": "Tính năng đặc biệt",
+        "content": "Thấm hút nhanh, chống tràn, mềm mại, có vạch chỉ báo ẩm ướt, co giãn tốt, không gây kích ứng da."
       },
       {
         "title": "Hướng dẫn sử dụng",
-        "content": "Với công nghệ DRY, Cool Touch, tính năng hút ẩm và khử mùi tiện nghi.\n- Chất thun co giãn mịn.\n- Viền sau mềm mại và mịn màng.\n- Vừa vặn thoải mái.\n- Được thiết kế không có dải lót ở phía sau để mang lại vẻ ngoài bóng bẩy.\n- Hỗ trợ toàn diện đảm bảo cúp luôn ở đúng vị trí.\n\n**Chiều rộng dây đeo vai khác nhau tùy theo kích cỡ."
+        "content": "Phù hợp cho bé từ 6-11kg. Thay tã mỗi 3-4 giờ hoặc khi tã đầy. Đảm bảo vệ sinh sạch sẽ trước khi thay."
       }
     ],
-    "sizes": ["S", "M", "L", "XL"],
+    "sizes": [
+      "M (6-11kg)"
+    ],
     "colors": [
       {
-        "name": "Đỏ",
-        "hex": "#FFC7C7"
-      },
-      {
-        "name": "Xanh dương",
-        "hex": "#DBEBFF"
-      },
-      {
-        "name": "Xanh lá",
-        "hex": "#D1F0DB"
-      },
-      {
-        "name": "Xám",
-        "hex": "#D9E2ED"
+        "name": "Trắng",
+        "hex": "#FFFFFF"
       }
     ]
   },
   {
     "id": 5,
-    "categoryId": 1,
-    "name": "Brown ribbed sweater",
-    "price": 189000,
-    "originalPrice": 300000,
+    "categoryId": 7,
+    "name": "Đồ chơi xếp hình gỗ thông minh",
+    "price": 180000,
     "image": "https://stc-zmp.zadn.vn/zaui-fashion/home/product-5.webp",
     "details": [
       {
         "title": "Mô tả sản phẩm",
-        "content": "Với công nghệ DRY, Cool Touch, tính năng hút ẩm và khử mùi tiện nghi.\n- Chất thun co giãn mịn.\n- Viền sau mềm mại và mịn màng.\n- Vừa vặn thoải mái.\n- Được thiết kế không có dải lót ở phía sau để mang lại vẻ ngoài bóng bẩy.\n- Hỗ trợ toàn diện đảm bảo cúp luôn ở đúng vị trí.\n\n**Chiều rộng dây đeo vai khác nhau tùy theo kích cỡ."
+        "content": "Đồ chơi giáo dục bằng gỗ tự nhiên, giúp bé phát triển tư duy logic, khả năng quan sát và sự khéo léo của đôi tay."
       },
       {
-        "title": "Chất liệu / Cách bảo quản",
-        "content": "Với công nghệ DRY, Cool Touch, tính năng hút ẩm và khử mùi tiện nghi.\n- Chất thun co giãn mịn.\n- Viền sau mềm mại và mịn màng.\n- Vừa vặn thoải mái.\n- Được thiết kế không có dải lót ở phía sau để mang lại vẻ ngoài bóng bẩy.\n- Hỗ trợ toàn diện đảm bảo cúp luôn ở đúng vị trí.\n\n**Chiều rộng dây đeo vai khác nhau tùy theo kích cỡ."
+        "title": "Chất liệu / An toàn",
+        "content": "Gỗ tự nhiên cao cấp, sơn an toàn cho trẻ em, không chứa chất độc hại. Các góc cạnh được mài nhẵn."
       },
       {
         "title": "Hướng dẫn sử dụng",
-        "content": "Với công nghệ DRY, Cool Touch, tính năng hút ẩm và khử mùi tiện nghi.\n- Chất thun co giãn mịn.\n- Viền sau mềm mại và mịn màng.\n- Vừa vặn thoải mái.\n- Được thiết kế không có dải lót ở phía sau để mang lại vẻ ngoài bóng bẩy.\n- Hỗ trợ toàn diện đảm bảo cúp luôn ở đúng vị trí.\n\n**Chiều rộng dây đeo vai khác nhau tùy theo kích cỡ."
+        "content": "Phù hợp cho bé từ 2 tuổi trở lên. Bé có thể xếp các khối gỗ theo hình mẫu hoặc tự sáng tạo."
       }
     ],
-    "sizes": ["S", "M", "L", "XL"],
+    "sizes": [
+      "Đơn"
+    ],
     "colors": [
       {
-        "name": "Đỏ",
-        "hex": "#FFC7C7"
-      },
-      {
-        "name": "Xanh dương",
-        "hex": "#DBEBFF"
-      },
-      {
-        "name": "Xanh lá",
-        "hex": "#D1F0DB"
-      },
-      {
-        "name": "Xám",
-        "hex": "#D9E2ED"
+        "name": "Nhiều màu",
+        "hex": "#FF6B6B"
       }
     ]
   },
   {
     "id": 6,
-    "categoryId": 1,
-    "name": "Chunky brown sweater",
-    "price": 189000,
-    "originalPrice": 300000,
+    "categoryId": 8,
+    "name": "Kem chống hăm Bepanthen 30g",
+    "price": 95000,
     "image": "https://stc-zmp.zadn.vn/zaui-fashion/home/product-6.webp",
     "details": [
       {
         "title": "Mô tả sản phẩm",
-        "content": "Với công nghệ DRY, Cool Touch, tính năng hút ẩm và khử mùi tiện nghi.\n- Chất thun co giãn mịn.\n- Viền sau mềm mại và mịn màng.\n- Vừa vặn thoải mái.\n- Được thiết kế không có dải lót ở phía sau để mang lại vẻ ngoài bóng bẩy.\n- Hỗ trợ toàn diện đảm bảo cúp luôn ở đúng vị trí.\n\n**Chiều rộng dây đeo vai khác nhau tùy theo kích cỡ."
+        "content": "Kem chống hăm hiệu quả, an toàn cho da bé, không chứa chất gây kích ứng. Giúp bảo vệ và phục hồi da bị tổn thương."
       },
       {
-        "title": "Chất liệu / Cách bảo quản",
-        "content": "Với công nghệ DRY, Cool Touch, tính năng hút ẩm và khử mùi tiện nghi.\n- Chất thun co giãn mịn.\n- Viền sau mềm mại và mịn màng.\n- Vừa vặn thoải mái.\n- Được thiết kế không có dải lót ở phía sau để mang lại vẻ ngoài bóng bẩy.\n- Hỗ trợ toàn diện đảm bảo cúp luôn ở đúng vị trí.\n\n**Chiều rộng dây đeo vai khác nhau tùy theo kích cỡ."
+        "title": "Thành phần",
+        "content": "Chứa Dexpanthenol (Vitamin B5), giúp tái tạo tế bào da, kháng viêm nhẹ, làm dịu vùng da bị kích ứng."
       },
       {
         "title": "Hướng dẫn sử dụng",
-        "content": "Với công nghệ DRY, Cool Touch, tính năng hút ẩm và khử mùi tiện nghi.\n- Chất thun co giãn mịn.\n- Viền sau mềm mại và mịn màng.\n- Vừa vặn thoải mái.\n- Được thiết kế không có dải lót ở phía sau để mang lại vẻ ngoài bóng bẩy.\n- Hỗ trợ toàn diện đảm bảo cúp luôn ở đúng vị trí.\n\n**Chiều rộng dây đeo vai khác nhau tùy theo kích cỡ."
+        "content": "Thoa một lớp mỏng lên vùng da bị hăm sau khi vệ sinh sạch sẽ. Sử dụng 2-3 lần/ngày hoặc theo chỉ định."
       }
     ],
-    "sizes": ["S", "M", "L", "XL"],
+    "sizes": [
+      "30g"
+    ],
     "colors": [
       {
-        "name": "Đỏ",
-        "hex": "#FFC7C7"
-      },
-      {
-        "name": "Xanh dương",
-        "hex": "#DBEBFF"
-      },
-      {
-        "name": "Xanh lá",
-        "hex": "#D1F0DB"
-      },
-      {
-        "name": "Xám",
-        "hex": "#D9E2ED"
+        "name": "Trắng",
+        "hex": "#FFFFFF"
       }
     ]
   },
   {
     "id": 7,
-    "categoryId": 1,
-    "name": "Classic brown wool sweater",
-    "price": 189000,
-    "originalPrice": 300000,
+    "categoryId": 9,
+    "name": "Bình sữa Dr.Brown's 150ml",
+    "price": 220000,
     "image": "https://stc-zmp.zadn.vn/zaui-fashion/home/product-7.webp",
     "details": [
       {
         "title": "Mô tả sản phẩm",
-        "content": "Với công nghệ DRY, Cool Touch, tính năng hút ẩm và khử mùi tiện nghi.\n- Chất thun co giãn mịn.\n- Viền sau mềm mại và mịn màng.\n- Vừa vặn thoải mái.\n- Được thiết kế không có dải lót ở phía sau để mang lại vẻ ngoài bóng bẩy.\n- Hỗ trợ toàn diện đảm bảo cúp luôn ở đúng vị trí.\n\n**Chiều rộng dây đeo vai khác nhau tùy theo kích cỡ."
+        "content": "Bình sữa chống sặc, thiết kế đặc biệt giúp bé bú dễ dàng hơn. Hệ thống thông khí độc quyền giảm đầy hơi."
       },
       {
-        "title": "Chất liệu / Cách bảo quản",
-        "content": "Với công nghệ DRY, Cool Touch, tính năng hút ẩm và khử mùi tiện nghi.\n- Chất thun co giãn mịn.\n- Viền sau mềm mại và mịn màng.\n- Vừa vặn thoải mái.\n- Được thiết kế không có dải lót ở phía sau để mang lại vẻ ngoài bóng bẩy.\n- Hỗ trợ toàn diện đảm bảo cúp luôn ở đúng vị trí.\n\n**Chiều rộng dây đeo vai khác nhau tùy theo kích cỡ."
+        "title": "Tính năng đặc biệt",
+        "content": "Chống sặc, giảm đầy hơi, chống trào ngược, dễ cầm, dễ vệ sinh, có thể tiệt trùng bằng nước sôi."
       },
       {
         "title": "Hướng dẫn sử dụng",
-        "content": "Với công nghệ DRY, Cool Touch, tính năng hút ẩm và khử mùi tiện nghi.\n- Chất thun co giãn mịn.\n- Viền sau mềm mại và mịn màng.\n- Vừa vặn thoải mái.\n- Được thiết kế không có dải lót ở phía sau để mang lại vẻ ngoài bóng bẩy.\n- Hỗ trợ toàn diện đảm bảo cúp luôn ở đúng vị trí.\n\n**Chiều rộng dây đeo vai khác nhau tùy theo kích cỡ."
+        "content": "Phù hợp cho bé từ 0-6 tháng. Tiệt trùng trước khi sử dụng lần đầu. Thay núm vú định kỳ 2-3 tháng."
       }
     ],
-    "sizes": ["S", "M", "L", "XL"],
+    "sizes": [
+      "150ml"
+    ],
     "colors": [
       {
-        "name": "Đỏ",
-        "hex": "#FFC7C7"
-      },
-      {
-        "name": "Xanh dương",
-        "hex": "#DBEBFF"
-      },
-      {
-        "name": "Xanh lá",
-        "hex": "#D1F0DB"
-      },
-      {
-        "name": "Xám",
-        "hex": "#D9E2ED"
+        "name": "Trong suốt",
+        "hex": "#E5E7EB"
       }
     ]
   },
   {
     "id": 8,
-    "categoryId": 1,
-    "name": "Long brown sweater brown sweater",
-    "price": 189000,
-    "originalPrice": 300000,
+    "categoryId": 10,
+    "name": "Bộ quần áo bé trai 2-3 tuổi",
+    "price": 200000,
     "image": "https://stc-zmp.zadn.vn/zaui-fashion/home/product-8.webp",
     "details": [
       {
         "title": "Mô tả sản phẩm",
-        "content": "Với công nghệ DRY, Cool Touch, tính năng hút ẩm và khử mùi tiện nghi.\n- Chất thun co giãn mịn.\n- Viền sau mềm mại và mịn màng.\n- Vừa vặn thoải mái.\n- Được thiết kế không có dải lót ở phía sau để mang lại vẻ ngoài bóng bẩy.\n- Hỗ trợ toàn diện đảm bảo cúp luôn ở đúng vị trí.\n\n**Chiều rộng dây đeo vai khác nhau tùy theo kích cỡ."
+        "content": "Bộ quần áo thời trang, chất liệu cotton mềm mại, thoáng mát cho bé. Thiết kế dễ mặc, dễ vận động."
       },
       {
         "title": "Chất liệu / Cách bảo quản",
-        "content": "Với công nghệ DRY, Cool Touch, tính năng hút ẩm và khử mùi tiện nghi.\n- Chất thun co giãn mịn.\n- Viền sau mềm mại và mịn màng.\n- Vừa vặn thoải mái.\n- Được thiết kế không có dải lót ở phía sau để mang lại vẻ ngoài bóng bẩy.\n- Hỗ trợ toàn diện đảm bảo cúp luôn ở đúng vị trí.\n\n**Chiều rộng dây đeo vai khác nhau tùy theo kích cỡ."
+        "content": "Chất liệu: Cotton 100% mềm mại\nCách bảo quản: Giặt máy ở nhiệt độ 30°C, không sử dụng chất tẩy mạnh."
       },
       {
         "title": "Hướng dẫn sử dụng",
-        "content": "Với công nghệ DRY, Cool Touch, tính năng hút ẩm và khử mùi tiện nghi.\n- Chất thun co giãn mịn.\n- Viền sau mềm mại và mịn màng.\n- Vừa vặn thoải mái.\n- Được thiết kế không có dải lót ở phía sau để mang lại vẻ ngoài bóng bẩy.\n- Hỗ trợ toàn diện đảm bảo cúp luôn ở đúng vị trí.\n\n**Chiều rộng dây đeo vai khác nhau tùy theo kích cỡ."
+        "content": "Phù hợp cho bé từ 2-3 tuổi. Mặc trực tiếp, có thể mặc trong nhà hoặc ra ngoài."
       }
     ],
-    "sizes": ["S", "M", "L", "XL"],
+    "sizes": [
+      "2T",
+      "3T"
+    ],
     "colors": [
       {
-        "name": "Đỏ",
-        "hex": "#FFC7C7"
+        "name": "Xanh dương",
+        "hex": "#2563EB"
       },
       {
-        "name": "Xanh dương",
-        "hex": "#DBEBFF"
+        "name": "Đỏ",
+        "hex": "#DC2626"
       },
       {
         "name": "Xanh lá",
-        "hex": "#D1F0DB"
+        "hex": "#10B981"
       },
       {
-        "name": "Xám",
-        "hex": "#D9E2ED"
+        "name": "Vàng",
+        "hex": "#F59E0B"
       }
     ]
   }

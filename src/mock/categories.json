@@ -1,52 +1,52 @@
 [
   {
     "id": 1,
-    "name": "Áo len",
+    "name": "Mẹ bầu",
     "image": "https://stc-zmp.zadn.vn/zaui-fashion/category/ao-len.webp"
   },
   {
     "id": 2,
-    "name": "Blazer",
+    "name": "Bé sơ sinh",
     "image": "https://stc-zmp.zadn.vn/zaui-fashion/category/blazer.webp"
   },
   {
     "id": 3,
-    "name": "Đầm",
+    "name": "Bé 1-3 tuổi",
     "image": "https://stc-zmp.zadn.vn/zaui-fashion/category/dam.webp"
   },
   {
     "id": 4,
-    "name": "Áo phông",
+    "name": "Bé 4-6 tuổi",
     "image": "https://stc-zmp.zadn.vn/zaui-fashion/category/ao-phong.webp"
   },
   {
     "id": 5,
-    "name": "Áo gi lê",
+    "name": "Sữa & Dinh dưỡng",
     "image": "https://stc-zmp.zadn.vn/zaui-fashion/category/ao-gile.webp"
   },
   {
     "id": 6,
-    "name": "Chân váy",
+    "name": "Tã & Bỉm",
     "image": "https://stc-zmp.zadn.vn/zaui-fashion/category/chan-vay.webp"
   },
   {
     "id": 7,
-    "name": "Quần short",
+    "name": "Đồ chơi giáo dục",
     "image": "https://stc-zmp.zadn.vn/zaui-fashion/category/quan-short.webp"
   },
   {
     "id": 8,
-    "name": "Quần bò",
+    "name": "Chăm sóc da bé",
     "image": "https://stc-zmp.zadn.vn/zaui-fashion/category/quan-jean.webp"
   },
   {
     "id": 9,
-    "name": "Túi xách",
+    "name": "Đồ dùng mẹ & bé",
     "image": "https://stc-zmp.zadn.vn/zaui-fashion/category/tui-xach.webp"
   },
   {
     "id": 10,
-    "name": "Phụ kiện",
+    "name": "Thời trang bé",
     "image": "https://stc-zmp.zadn.vn/zaui-fashion/category/phu-kien.webp"
   }
 ]

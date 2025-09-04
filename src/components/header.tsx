@@ -33,6 +33,11 @@ export default function Header() {
     return (
       <div className="h-14 w-full flex items-center px-4 py-2">
         <img src={headerLogoImage} className="max-h-full flex-none" />
+        <div className="ml-1 text-xl font-medium text-gray-700 font-lobster">
+          Sản phẩm chăm sóc mẹ và bé
+        </div>
+
+
       </div>
     );
   }
@@ -44,7 +49,7 @@ export default function Header() {
           <BackIcon />
         </div>
       )}
-      <div className="text-xl font-medium truncate">{title}</div>
+      <div className="text-xl font-medium truncate font-lobster header-title">{title}</div>
     </div>
   );
 }
