@@ -1,9 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  purge: {
-    enabled: true,
-    content: ["./src/**/*.{js,jsx,ts,tsx,vue}"],
-  },
+  content: ["./src/**/*.{js,jsx,ts,tsx,vue}"],
   theme: {
     extend: {
       colors: {
@@ -28,9 +25,9 @@ module.exports = {
         xl: ["18px", "24px"],
       },
       fontFamily: {
-        lobster: ["Lobster", "cursive"],
-        Pacifico: ["Pacifico", "cursive"],
-        Signika: ["Signika", "cursive"],
+        lobster: ["Lobster", "Arial", "Helvetica", "cursive"],
+        Pacifico: ["Pacifico", "Arial", "Helvetica", "cursive"],
+        Signika: ["Signika", "Arial", "Helvetica", "sans-serif"],
         // thêm dòng này để dùng Google Font Lobster
       },
     },
