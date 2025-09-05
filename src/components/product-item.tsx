@@ -47,23 +47,6 @@ export default function ProductItem(props: ProductItemProps) {
             <div className="text-sm font-bold text-primary mb-2">
               {formatPrice(props.product.price)}
             </div>
-            {props.product.colors && props.product.colors.length > 0 && (
-              <div className="flex space-x-1 mb-2">
-                {props.product.colors.slice(0, 4).map((color, index) => (
-                  <div
-                    key={index}
-                    className="w-4 h-4 rounded-full border border-gray-200"
-                    style={{ backgroundColor: color.hex }}
-                    title={color.name}
-                  />
-                ))}
-              </div>
-            )}
-            {props.product.sizes && props.product.sizes.length > 0 && (
-              <div className="text-3xs text-subtitle">
-                Size: {props.product.sizes.join(", ")}
-              </div>
-            )}
           </div>
         </>
       )}

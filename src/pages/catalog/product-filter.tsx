@@ -18,40 +18,7 @@ export default function ProductFilter() {
 
   return (
     <div className="flex px-4 py-3 space-x-2 overflow-x-auto">
-      <Suspense fallback={<SelectSkeleton width={110} />}>
-        <Select
-          items={sizes}
-          value={size}
-          onChange={setSize}
-          renderTitle={(selectedSize?: string) =>
-            `Kích thước${selectedSize ? `: ${selectedSize}` : ""}`
-          }
-          renderItemKey={(size: string) => String(size)}
-        />
-      </Suspense>
-      <Suspense fallback={<SelectSkeleton width={95} />}>
-        <Select
-          items={colors}
-          value={color}
-          onChange={setColor}
-          renderTitle={(selectedColor?: Color) =>
-            `Màu sắc${selectedColor ? `: ${selectedColor.name}` : ""}`
-          }
-          renderItemLabel={(color: Color) => color.name}
-          renderItemKey={(color: Color) => color.name}
-        />
-      </Suspense>
-      {(color !== undefined || size !== undefined) && (
-        <button
-          className="bg-primary text-white rounded-full h-8 flex-none px-3"
-          onClick={() => {
-            setColor(undefined);
-            setSize(undefined);
-          }}
-        >
-          Xoá bộ lọc
-        </button>
-      )}
+      {/* Đã xóa bộ lọc kích thước và màu sắc */}
     </div>
   );
 }

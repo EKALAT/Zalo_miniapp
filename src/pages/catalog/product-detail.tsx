@@ -10,34 +10,17 @@ import {
 import { productState } from "@/state";
 import { formatPrice } from "@/utils/format";
 import ShareButton from "./share-buttont";
-import VariantPicker from "./variant-picker";
 import { useEffect, useRef, useState } from "react";
 import Collapse from "@/components/collapse";
 import RelatedProducts from "./related-products";
 import { useAddToCart } from "@/hooks";
 import toast from "react-hot-toast";
-import { Color, Size } from "types";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const product = useAtomValue(productState(Number(id)))!;
-  const [selectedColor, setSelectedColor] = useState<Color>();
-  const [selectedSize, setSelectedSize] = useState<Size>();
-
-  useEffect(() => {
-    setSelectedColor(product.colors?.[0]);
-    setSelectedSize(product.sizes?.[0]);
-  }, [id]);
-
-  const { addToCart, setOptions } = useAddToCart(product);
-
-  useEffect(() => {
-    setOptions({
-      size: selectedSize,
-      color: selectedColor?.name,
-    });
-  }, [selectedSize, selectedColor]);
+  const { addToCart } = useAddToCart(product);
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -82,24 +65,6 @@ export default function ProductDetailPage() {
                     className="w-full h-full rounded-full"
                     style={{ backgroundColor: variant?.hex }}
                   />
-                </div>
-              )}
-            />
-          )}
-          <HorizontalDivider />
-          {product.sizes && (
-            <VariantPicker
-              title="Size"
-              variants={product.sizes}
-              value={selectedSize}
-              onChange={(size) => setSelectedSize(size)}
-              renderVariant={(variant, selected) => (
-                <div
-                  className={"w-full h-full flex justify-center items-center ".concat(
-                    selected ? "bg-primary text-white" : ""
-                  )}
-                >
-                  <div className="truncate">{variant}</div>
                 </div>
               )}
             />
