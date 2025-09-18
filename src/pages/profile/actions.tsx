@@ -1,25 +1,15 @@
-import {
-  OrderHistoryIcon,
-  PackageIcon,
-  ProfileIcon,
-  VoucherIcon,
-} from "@/components/vectors";
+import { OrderHistoryIcon, PackageIcon, ProfileIcon } from "@/components/vectors";
 import { useToBeImplemented } from "@/hooks";
 
 export default function ProfileActions() {
   const toBeImplemented = useToBeImplemented();
 
   return (
-    <div className="bg-white rounded-lg p-4 grid grid-cols-4 gap-4 border-[0.5px] border-black/15">
+    <div className="bg-white rounded-lg p-4 flex justify-center gap-6 border-[0.5px] border-black/15">
       {[
         {
           label: "Thông tin tài khoản",
           icon: ProfileIcon,
-          onClick: toBeImplemented,
-        },
-        {
-          label: "Đổi voucher",
-          icon: VoucherIcon,
           onClick: toBeImplemented,
         },
         {

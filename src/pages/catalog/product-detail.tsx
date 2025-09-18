@@ -1,26 +1,25 @@
 import Button from "@/components/button";
 import HorizontalDivider from "@/components/horizontal-divider";
 import { useAtomValue } from "jotai";
-import {
-  unstable_useViewTransitionState,
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { productState } from "@/state";
 import { formatPrice } from "@/utils/format";
 import ShareButton from "./share-buttont";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Collapse from "@/components/collapse";
 import RelatedProducts from "./related-products";
 import { useAddToCart } from "@/hooks";
 import toast from "react-hot-toast";
+import VariantPicker from "./variant-picker";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const product = useAtomValue(productState(Number(id)))!;
   const { addToCart } = useAddToCart(product);
+  const [selectedColor, setSelectedColor] = useState(
+    product.colors ? product.colors[0] : undefined
+  );
 
   return (
     <div className="w-full h-full flex flex-col">
