@@ -4,11 +4,13 @@ import { useCheckout, useCustomerSupport } from "@/hooks";
 import { useAtomValue } from "jotai";
 import { cartTotalState } from "@/state";
 import { formatPrice } from "@/utils/format";
+import { useNavigate } from "react-router-dom";
 
 export default function CartSummary() {
   const { totalItems, totalAmount } = useAtomValue(cartTotalState);
   const contact = useCustomerSupport();
   const checkout = useCheckout();
+  const navigate = useNavigate();
 
   return (
     <div className="flex-none flex items-center py-3 px-4 space-x-2">
@@ -21,7 +23,7 @@ export default function CartSummary() {
       <Button className="w-10 h-10 !p-2" onClick={contact}>
         <CustomerSupportIcon />
       </Button>
-      <Button primary onClick={checkout} disabled={totalItems === 0}>
+      <Button primary onClick={() => navigate("/checkout")} disabled={totalItems === 0}>
         Mua ngay
       </Button>
     </div>

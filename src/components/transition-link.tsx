@@ -1,6 +1,6 @@
 import { NavLink, NavLinkProps } from "react-router-dom";
 
-export interface TransitionLinkProps extends NavLinkProps {}
+export interface TransitionLinkProps extends NavLinkProps { }
 
 /**
  * Wrapper component for view transition enabled Links, to stablize the API.
@@ -8,5 +8,5 @@ export interface TransitionLinkProps extends NavLinkProps {}
  * @returns
  */
 export default function TransitionLink(props: TransitionLinkProps) {
-  return <NavLink {...props} unstable_viewTransition />;
+  return <NavLink {...props} unstable_viewtransition />;
 }

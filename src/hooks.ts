@@ -2,7 +2,7 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { MutableRefObject, useLayoutEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { UIMatch, useMatches } from "react-router-dom";
-import { cartState, cartTotalState } from "@/state";
+import { cartState, cartTotalState, checkoutItemsState, selectedCartItemIdsState } from "@/state";
 import { Cart, CartItem, Product, SelectedOptions } from "types";
 import { getDefaultOptions, isIdentical } from "@/utils/cart";
 import { getConfig } from "@/utils/template";
@@ -22,7 +22,7 @@ export function useRealHeight(
       ro.observe(element.current);
       return () => ro.disconnect();
     }
-    return () => {};
+    return () => { };
   }, [element.current]);
 
   if (typeof ResizeObserver === "undefined") {
@@ -121,17 +121,25 @@ export function useToBeImplemented() {
 
 export function useCheckout() {
   const { totalAmount } = useAtomValue(cartTotalState);
+  const checkoutItems = useAtomValue(checkoutItemsState);
   const setCart = useSetAtom(cartState);
+  const setSelectedCartItemIds = useSetAtom(selectedCartItemIdsState);
+
   return async () => {
     try {
+      // For now, just simulate payment success
       await purchase({
         amount: totalAmount,
         desc: "Thanh toán đơn hàng",
         method: "",
       });
+
       toast.success("Thanh toán thành công. Cảm ơn bạn đã mua hàng!", {
         icon: "🎉",
       });
+
+      // Clear selected items and cart
+      setSelectedCartItemIds([]);
       setCart([]);
     } catch (error) {
       toast.error(

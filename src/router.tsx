@@ -6,6 +6,7 @@ import ProductDetailPage from "@/pages/catalog/product-detail";
 import HomePage from "@/pages/home";
 import ProfilePage from "@/pages/profile";
 import SearchPage from "@/pages/search";
+import CheckoutPage from "@/pages/checkout";
 import { createBrowserRouter } from "react-router-dom";
 import { getBasePath } from "@/utils/zma";
 
@@ -73,10 +74,22 @@ const router = createBrowserRouter(
             title: "Tìm kiếm",
           },
         },
+        {
+          path: "/checkout",
+          element: <CheckoutPage />,
+          handle: {
+            title: "Thanh toán",
+          },
+        },
       ],
     },
   ],
-  { basename: getBasePath() }
+  {
+    basename: getBasePath(),
+    future: {
+      v7_startTransition: true
+    }
+  }
 );
 
 export default router;
