@@ -30,7 +30,6 @@ ALTER TABLE cart_items DISABLE ROW LEVEL SECURITY;
 -- Uncomment the section below if you prefer to keep RLS enabled
 -- but allow anonymous users to create orders
 
-/*
 -- Drop existing restrictive policies
 DROP POLICY IF EXISTS "Users can view their own orders" ON orders;
 DROP POLICY IF EXISTS "Users can create their own orders" ON orders;
@@ -85,7 +84,6 @@ CREATE POLICY "Allow anon to view shipping tracking" ON shipping_tracking
 CREATE POLICY "Allow anon to manage cart items" ON cart_items
   FOR ALL TO anon
   USING (true);
-*/
 
 -- =====================================================
 -- VERIFICATION QUERIES
