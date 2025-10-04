@@ -10,16 +10,12 @@ import Collapse from "@/components/collapse";
 import RelatedProducts from "./related-products";
 import { useAddToCart } from "@/hooks";
 import toast from "react-hot-toast";
-import VariantPicker from "./variant-picker";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const product = useAtomValue(productState(Number(id)))!;
   const { addToCart } = useAddToCart(product);
-  const [selectedColor, setSelectedColor] = useState(
-    product.colors ? product.colors[0] : undefined
-  );
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -48,26 +44,6 @@ export default function ProductDetailPage() {
           <div className="py-2">
             <ShareButton product={product} />
           </div>
-          {product.colors && (
-            <VariantPicker
-              title="Color"
-              variants={product.colors}
-              value={selectedColor}
-              onChange={(color) => setSelectedColor(color)}
-              renderVariant={(variant, selected) => (
-                <div
-                  className={"w-full h-full rounded-full ".concat(
-                    selected ? "border-2 border-primary p-0.5" : ""
-                  )}
-                >
-                  <div
-                    className="w-full h-full rounded-full"
-                    style={{ backgroundColor: variant?.hex }}
-                  />
-                </div>
-              )}
-            />
-          )}
         </div>
         {product.details && (
           <>

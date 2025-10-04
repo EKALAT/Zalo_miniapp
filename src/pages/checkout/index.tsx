@@ -1,11 +1,13 @@
-import { useState } from "react";
-import { useAtomValue } from "jotai";
+import { useState, useEffect } from "react";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useNavigate } from "react-router-dom";
 import Button from "@/components/button";
 import HorizontalDivider from "@/components/horizontal-divider";
-import { checkoutItemsState, cartTotalState } from "@/state";
+import { checkoutItemsState, cartTotalState, cartState, selectedCartItemIdsState } from "@/state";
 import { createOrder } from "@/services/orders";
 import { useAuthStatus } from "@/services/auth";
+import { useAuth } from "@/hooks";
+import { clearCartFromStorage } from "@/utils/cart";
 import toast from "react-hot-toast";
 
 export default function CheckoutPage() {
@@ -13,6 +15,11 @@ export default function CheckoutPage() {
     const checkoutItems = useAtomValue(checkoutItemsState);
     const { totalAmount } = useAtomValue(cartTotalState);
     const isLoggedIn = useAuthStatus();
+    const { user, refreshUser, loading: userLoading } = useAuth();
+
+    // State setters for clearing cart
+    const setCart = useSetAtom(cartState);
+    const setSelectedCartItemIds = useSetAtom(selectedCartItemIdsState);
 
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
@@ -25,6 +32,23 @@ export default function CheckoutPage() {
 
     const shippingFee = 30000;
     const finalAmount = totalAmount + shippingFee;
+
+    // Auto-fill form data from user profile
+    useEffect(() => {
+        if (user) {
+            setFormData(prev => ({
+                ...prev,
+                shipping_name: user.name || prev.shipping_name,
+                shipping_phone: user.phone || prev.shipping_phone,
+                shipping_address: user.default_address || prev.shipping_address,
+            }));
+            console.log('🔄 Auto-filled form with user data:', {
+                name: user.name,
+                phone: user.phone,
+                address: user.default_address
+            });
+        }
+    }, [user]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -53,7 +77,13 @@ export default function CheckoutPage() {
 
             await createOrder(userId, checkoutItems, formData);
 
-            toast.success("Đặt hàng thành công!");
+            // Clear cart after successful order
+            console.log("🛒 Clearing cart after successful order");
+            setCart([]);
+            setSelectedCartItemIds([]);
+            clearCartFromStorage();
+
+            toast.success("Đặt hàng thành công! Giỏ hàng đã được xóa.");
             navigate("/profile");
         } catch (error) {
             console.error("Order creation failed:", error);
@@ -89,8 +119,6 @@ export default function CheckoutPage() {
                                 <div className="text-sm font-medium">{item.product.name}</div>
                                 <div className="text-2xs text-subtitle">
                                     {item.options.size && `Size: ${item.options.size}`}
-                                    {item.options.size && item.options.color && " • "}
-                                    {item.options.color && `Màu: ${item.options.color}`}
                                 </div>
                                 <div className="text-sm text-primary">
                                     {item.quantity} × {item.product.price.toLocaleString()}đ
@@ -104,10 +132,45 @@ export default function CheckoutPage() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="bg-white rounded-lg p-4 border-[0.5px] border-black/15">
                         <h2 className="text-lg font-medium mb-3">Thông tin giao hàng</h2>
+                        {user && (user.name || user.phone || user.default_address) && (
+                            <div className="mb-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                                <div className="flex items-start justify-between">
+                                    <div>
+                                        <p className="text-sm text-green-700 font-medium mb-1">
+                                            ✅ Thông tin đã được tự động điền từ hồ sơ của bạn
+                                        </p>
+                                        <p className="text-xs text-green-600">
+                                            Bạn có thể chỉnh sửa bất kỳ thông tin nào bên dưới
+                                        </p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => navigate('/profile/account-info')}
+                                        className="text-xs text-green-600 hover:text-green-800 underline whitespace-nowrap ml-2"
+                                    >
+                                        Cập nhật hồ sơ
+                                    </button>
+                                </div>
+                            </div>
+                        )}
 
                         <div className="space-y-3">
                             <div>
-                                <label className="block text-sm font-medium mb-1">Họ và tên *</label>
+                                <div className="flex justify-between items-center mb-1">
+                                    <label className="block text-sm font-medium">Họ và tên *</label>
+                                    {user?.name && formData.shipping_name !== user.name && (
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setFormData(prev => ({ ...prev, shipping_name: user.name || '' }));
+                                                toast.success('Đã sử dụng tên từ hồ sơ');
+                                            }}
+                                            className="text-xs text-blue-600 hover:text-blue-800 underline"
+                                        >
+                                            Sử dụng từ hồ sơ
+                                        </button>
+                                    )}
+                                </div>
                                 <input
                                     type="text"
                                     name="shipping_name"
@@ -120,7 +183,21 @@ export default function CheckoutPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium mb-1">Số điện thoại *</label>
+                                <div className="flex justify-between items-center mb-1">
+                                    <label className="block text-sm font-medium">Số điện thoại *</label>
+                                    {user?.phone && formData.shipping_phone !== user.phone && (
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setFormData(prev => ({ ...prev, shipping_phone: user.phone || '' }));
+                                                toast.success('Đã sử dụng số điện thoại từ hồ sơ');
+                                            }}
+                                            className="text-xs text-blue-600 hover:text-blue-800 underline"
+                                        >
+                                            Sử dụng từ hồ sơ
+                                        </button>
+                                    )}
+                                </div>
                                 <input
                                     type="tel"
                                     name="shipping_phone"
@@ -133,7 +210,47 @@ export default function CheckoutPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium mb-1">Địa chỉ giao hàng *</label>
+                                <div className="flex justify-between items-center mb-1">
+                                    <label className="block text-sm font-medium">Địa chỉ giao hàng *</label>
+                                    <div className="flex gap-2">
+                                        {user?.default_address && (
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setFormData(prev => ({ ...prev, shipping_address: user.default_address || '' }));
+                                                    toast.success('Đã sử dụng địa chỉ mặc định');
+                                                }}
+                                                className="text-xs text-blue-600 hover:text-blue-800 underline"
+                                            >
+                                                Sử dụng địa chỉ mặc định
+                                            </button>
+                                        )}
+                                        {formData.shipping_address && formData.shipping_address !== user?.default_address && (
+                                            <button
+                                                type="button"
+                                                onClick={async () => {
+                                                    if (user) {
+                                                        try {
+                                                            const { updateProfile } = await import('@/services/auth');
+                                                            const updatedProfile = await updateProfile({
+                                                                id: user.id,
+                                                                default_address: formData.shipping_address
+                                                            });
+                                                            // Refresh user data to show updated information
+                                                            await refreshUser();
+                                                            toast.success('✅ Đã lưu địa chỉ làm mặc định');
+                                                        } catch (error) {
+                                                            toast.error('Không thể lưu địa chỉ mặc định');
+                                                        }
+                                                    }
+                                                }}
+                                                className="text-xs text-green-600 hover:text-green-800 underline"
+                                            >
+                                                Lưu địa chỉ mặc định
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
                                 <textarea
                                     name="shipping_address"
                                     value={formData.shipping_address}
@@ -170,6 +287,46 @@ export default function CheckoutPage() {
                                     <option value="bank_transfer">Chuyển khoản ngân hàng</option>
                                 </select>
                             </div>
+
+                            {/* Save to Profile Section */}
+                            {user && (
+                                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm font-medium text-blue-700">💾 Lưu thông tin vào hồ sơ</p>
+                                            <p className="text-xs text-blue-600">Cập nhật thông tin cá nhân và địa chỉ mặc định để sử dụng cho lần sau</p>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={async () => {
+                                                if (user) {
+                                                    try {
+                                                        const { updateProfile } = await import('@/services/auth');
+                                                        const updatedProfile = await updateProfile({
+                                                            id: user.id,
+                                                            name: formData.shipping_name,
+                                                            phone: formData.shipping_phone,
+                                                            default_address: formData.shipping_address
+                                                        });
+                                                        // Refresh user data to show updated information
+                                                        await refreshUser();
+                                                        toast.success('✅ Đã lưu thông tin vào hồ sơ thành công! Thông tin đã được cập nhật trong trang thành viên.');
+
+                                                        // Dispatch event to notify other components
+                                                        window.dispatchEvent(new CustomEvent('user-updated'));
+                                                    } catch (error) {
+                                                        console.error('Failed to save profile:', error);
+                                                        toast.error('❌ Không thể lưu thông tin vào hồ sơ');
+                                                    }
+                                                }
+                                            }}
+                                            className="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                                        >
+                                            Lưu vào hồ sơ
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </form>

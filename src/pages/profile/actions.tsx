@@ -2,9 +2,11 @@ import { OrderHistoryIcon, PackageIcon, ProfileIcon } from "@/components/vectors
 import { useToBeImplemented } from "@/hooks";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { getUserInfo, getPhoneNumber } from "zmp-sdk";
+import { useNavigate } from "react-router-dom";
 
 export default function ProfileActions() {
   const toBeImplemented = useToBeImplemented();
+  const navigate = useNavigate();
   const login = async () => {
     try {
       const user = await getUserInfo({ avatarType: "normal" });
@@ -44,18 +46,18 @@ export default function ProfileActions() {
         {
           label: "Thông tin tài khoản",
           icon: ProfileIcon,
-          onClick: toBeImplemented,
+          onClick: () => navigate("/profile/account-info"),
         },
         // Đăng nhập được đưa lên ô trên, không hiển thị ở đây
         {
           label: "Theo dõi đơn hàng",
           icon: PackageIcon,
-          onClick: toBeImplemented,
+          onClick: () => navigate("/profile/order-tracking"),
         },
         {
           label: "Lịch sử mua hàng",
           icon: OrderHistoryIcon,
-          onClick: toBeImplemented,
+          onClick: () => navigate("/profile/order-history"),
         },
       ].map((action) => (
         <div

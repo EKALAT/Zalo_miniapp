@@ -1,5 +1,5 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { MutableRefObject, useLayoutEffect, useMemo, useState } from "react";
+import { MutableRefObject, useLayoutEffect, useMemo, useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { UIMatch, useMatches } from "react-router-dom";
 import { cartState, cartTotalState, checkoutItemsState, selectedCartItemIdsState } from "@/state";
@@ -7,6 +7,7 @@ import { Cart, CartItem, Product, SelectedOptions } from "types";
 import { getDefaultOptions, isIdentical } from "@/utils/cart";
 import { getConfig } from "@/utils/template";
 import { openChat, purchase } from "zmp-sdk";
+import { ZaloUserProfile, autoLoginAndUpsert, useAuthStatus, getUserProfile } from "@/services/auth";
 
 export function useRealHeight(
   element: MutableRefObject<HTMLDivElement | null>,
@@ -163,4 +164,80 @@ export function useRouteHandle() {
   const lastMatch = matches[matches.length - 1];
 
   return [lastMatch.handle, lastMatch, matches] as const;
+}
+
+export function useAuth() {
+  const [user, setUser] = useState<ZaloUserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const loggedIn = useAuthStatus();
+
+  // Function to refresh user data from database
+  const refreshUser = async () => {
+    if (!loggedIn) {
+      setUser(null);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    const userId = localStorage.getItem("zma_user_id");
+
+    console.log("🔄 Refreshing user data...");
+    console.log("User ID from localStorage:", userId);
+    console.log("Logged in status:", loggedIn);
+
+    if (userId) {
+      try {
+        console.log("📡 Loading user from database with ID:", userId);
+        const profile = await getUserProfile(userId);
+        if (profile) {
+          console.log("✅ User loaded from database:", profile);
+          setUser(profile);
+          setLoading(false);
+          return;
+        } else {
+          console.log("⚠️ No profile found in database for ID:", userId);
+        }
+      } catch (error) {
+        console.error('❌ Failed to load user from database:', error);
+      }
+    } else {
+      console.log("⚠️ No user ID found in localStorage");
+    }
+
+    // Fallback to autoLoginAndUpsert if no user ID or database load failed
+    try {
+      console.log("🔄 Falling back to autoLoginAndUpsert");
+      const profile = await autoLoginAndUpsert();
+      if (profile) {
+        console.log("✅ User loaded via autoLoginAndUpsert:", profile);
+        setUser(profile);
+      } else {
+        console.log("❌ No profile returned from autoLoginAndUpsert");
+        setUser(null);
+      }
+    } catch (error) {
+      console.error('❌ Failed to load user via autoLoginAndUpsert:', error);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Listen for custom events to refresh user data
+  useEffect(() => {
+    const handleUserUpdate = () => {
+      console.log("🔄 User update event received, refreshing...");
+      refreshUser();
+    };
+
+    window.addEventListener('user-updated', handleUserUpdate);
+    return () => window.removeEventListener('user-updated', handleUserUpdate);
+  }, [loggedIn]);
+
+  useEffect(() => {
+    refreshUser();
+  }, [loggedIn]);
+
+  return { user, setUser, refreshUser, loading };
 }

@@ -24,7 +24,6 @@ export default function CartItem(props: CartItemProps) {
     () =>
       Object.entries({
         Size: props.options.size,
-        Color: props.options.color,
       })
         .filter(([_, value]) => value !== undefined)
         .map(([key, value]) => `${key}: ${value}`)

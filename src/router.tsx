@@ -5,6 +5,9 @@ import CategoryListPage from "@/pages/catalog/category-list";
 import ProductDetailPage from "@/pages/catalog/product-detail";
 import HomePage from "@/pages/home";
 import ProfilePage from "@/pages/profile";
+import OrderHistoryPage from "@/pages/profile/order-history";
+import OrderTrackingPage from "@/pages/profile/order-tracking";
+import AccountInfoPage from "@/pages/profile/account-info";
 import SearchPage from "@/pages/search";
 import CheckoutPage from "@/pages/checkout";
 import { createBrowserRouter } from "react-router-dom";
@@ -43,6 +46,27 @@ const router = createBrowserRouter(
           element: <ProfilePage />,
           handle: {
             logo: true,
+          },
+        },
+        {
+          path: "/profile/order-tracking",
+          element: <OrderTrackingPage />,
+          handle: {
+            title: "Theo dõi đơn hàng",
+          },
+        },
+        {
+          path: "/profile/order-history",
+          element: <OrderHistoryPage />,
+          handle: {
+            title: "Lịch sử mua hàng",
+          },
+        },
+        {
+          path: "/profile/account-info",
+          element: <AccountInfoPage />,
+          handle: {
+            title: "Thông tin tài khoản",
           },
         },
         {

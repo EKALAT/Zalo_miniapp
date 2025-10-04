@@ -29,7 +29,6 @@ export interface Color {
 
 export type SelectedOptions = {
   size?: Size;
-  color?: Color["name"];
 };
 
 export interface CartItem {
