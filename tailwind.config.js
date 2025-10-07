@@ -24,12 +24,7 @@ module.exports = {
         lg: ["16px", "22px"],
         xl: ["18px", "24px"],
       },
-      fontFamily: {
-        lobster: ["Lobster", "Arial", "Helvetica", "cursive"],
-        Pacifico: ["Pacifico", "Arial", "Helvetica", "cursive"],
-        Signika: ["Signika", "Arial", "Helvetica", "sans-serif"],
-        // thêm dòng này để dùng Google Font Lobster
-      },
+      fontFamily: {},
     },
   },
   plugins: [],

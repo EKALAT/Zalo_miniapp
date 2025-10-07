@@ -29,6 +29,12 @@ export default function ProfilePage() {
     <div className="min-h-full bg-section p-4 space-y-2.5">
       <UserCard />
       <ProfileActions />
+      {/* Watermark */}
+      <div className="relative">
+        <div className="pointer-events-none select-none text-center text-xs md:text-sm text-gray-300 tracking-widest uppercase">
+          developed by PHOMMASENG EKALAT
+        </div>
+      </div>
     </div>
   );
 }

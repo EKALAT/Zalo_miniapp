@@ -4,14 +4,13 @@
 }
 
 body {
-  font-family: "Signika", "Arial", "Helvetica", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
   font-display: swap;
 }
 
 /* Font cho header title */
 .header-title {
-  font-family: 'Lobster', 'Arial', 'Helvetica', cursive !important;
-  font-display: swap;
+  font-family: inherit !important;
 }
 
 /* Logo tròn */
