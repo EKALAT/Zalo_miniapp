@@ -111,9 +111,10 @@ export async function createOrder(
         .insert(orderItems);
 
     if (itemsError) {
-        // Rollback order if items creation fails
-        await supabase.from("orders").delete().eq("id", order.id);
-        throw new Error(`Failed to create order items: ${itemsError.message}`);
+        // Không rollback để dễ truy vết; báo lỗi chi tiết để người dùng cấu hình RLS
+        const details = [itemsError.message, itemsError.details, itemsError.hint].filter(Boolean).join(' | ');
+        console.error('❌ order_items insert failed. Order kept for debugging. Configure RLS for public.order_items.');
+        throw new Error(`Failed to create order items: ${details || 'unknown error'}`);
     }
 
     // Add initial status to history

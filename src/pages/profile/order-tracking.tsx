@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { getUserOrdersWithItems, Order } from '@/services/orders';
 import { useAuth } from '@/hooks';
 import { useAuthStatus } from '@/services/auth';
-import { formatPrice } from '@/utils/format';
+import { formatPrice, formatDate, APP_TIME_ZONE } from '@/utils/format';
 
 interface OrderWithItems extends Order {
     items: Array<{
@@ -173,7 +173,7 @@ const OrderTrackingPage: React.FC = () => {
                                         <div className="mb-3">
                                             <h3 className="font-bold text-lg">#{order.order_number}</h3>
                                             <p className="text-sm text-gray-600">
-                                                Đặt ngày: {new Date(order.created_at).toLocaleDateString('vi-VN')}
+                                                Đặt ngày: {formatDate(order.created_at)}
                                             </p>
                                         </div>
 
@@ -278,7 +278,7 @@ const OrderTrackingPage: React.FC = () => {
                                             <div>
                                                 <p className="text-gray-600">Cập nhật:</p>
                                                 <p className="font-medium">
-                                                    {new Date(order.updated_at).toLocaleDateString('vi-VN')}
+                                                    {formatDate(order.updated_at)}
                                                 </p>
                                             </div>
                                         </div>

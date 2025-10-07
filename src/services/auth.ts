@@ -27,22 +27,23 @@ export async function updateProfile(profile: Partial<ZaloUserProfile>): Promise<
     console.log("🔗 Supabase URL:", import.meta.env.VITE_SUPABASE_URL);
     console.log("🔗 Supabase Key exists:", !!import.meta.env.VITE_SUPABASE_ANON_KEY);
 
-    // Prepare update data - always include all fields
+    // Prepare update data - DO NOT overwrite with null unless explicitly provided
     const updateData: any = {
         id: profile.id,
         updated_at: new Date().toISOString(),
     };
 
-    // Always include name, phone, and default_address
-    updateData.name = profile.name ? profile.name.trim() : null;
-    updateData.avatar = profile.avatar ? profile.avatar.trim() : null;
-    updateData.default_address = profile.default_address ? profile.default_address.trim() : null;
-
-    // Handle phone number - always include it
-    if (profile.phone !== undefined && profile.phone !== null) {
-        updateData.phone = profile.phone.trim() || null;
-    } else {
-        updateData.phone = null;
+    if (Object.prototype.hasOwnProperty.call(profile, 'name')) {
+        updateData.name = profile.name ? profile.name.trim() : null;
+    }
+    if (Object.prototype.hasOwnProperty.call(profile, 'avatar')) {
+        updateData.avatar = profile.avatar ? profile.avatar.trim() : null;
+    }
+    if (Object.prototype.hasOwnProperty.call(profile, 'default_address')) {
+        updateData.default_address = profile.default_address ? profile.default_address.trim() : null;
+    }
+    if (Object.prototype.hasOwnProperty.call(profile, 'phone')) {
+        updateData.phone = profile.phone ? profile.phone.trim() : null;
     }
 
     console.log("📝 Prepared update data:", updateData);
@@ -57,7 +58,27 @@ export async function updateProfile(profile: Partial<ZaloUserProfile>): Promise<
     });
 
     try {
-        // First try to update existing record
+        // 0) Try RPC (if available) to avoid RLS quirks; ignore if function not defined
+        try {
+            const { data: rpcData, error: rpcError } = await supabase.rpc('save_user_profile', {
+                _id: profile.id,
+                _name: typeof updateData.name !== 'undefined' ? updateData.name : null,
+                _phone: typeof updateData.phone !== 'undefined' ? updateData.phone : null,
+                _default_address: typeof updateData.default_address !== 'undefined' ? updateData.default_address : null,
+            });
+            if (!rpcError && rpcData) {
+                console.log("✅ Profile saved via RPC save_user_profile");
+                return rpcData as ZaloUserProfile;
+            }
+            if (rpcError) {
+                // If function not found or not permitted, fall through to normal path
+                console.warn('RPC save_user_profile failed/absent, falling back:', rpcError.message);
+            }
+        } catch (e) {
+            console.warn('RPC save_user_profile unreachable, falling back to direct upsert.');
+        }
+
+        // First try to update existing record (only provided fields)
         console.log("🔄 Attempting update...");
         const { data: updateResult, error: updateError } = await supabase
             .from("users")
@@ -104,6 +125,39 @@ export async function updateProfile(profile: Partial<ZaloUserProfile>): Promise<
         console.error("❌ Database operation failed:", error);
         throw error;
     }
+}
+
+// Focused helper: save phone and default_address reliably
+export async function saveUserContact(
+    userId: string,
+    phone?: string,
+    defaultAddress?: string
+): Promise<ZaloUserProfile> {
+    if (!isSupabaseConfigured) {
+        throw new Error("Supabase not configured");
+    }
+    if (!userId) throw new Error("User ID is required");
+
+    const payload = {
+        id: userId,
+        phone: typeof phone === 'string' ? phone.trim() || null : null,
+        default_address: typeof defaultAddress === 'string' ? defaultAddress.trim() || null : null,
+        updated_at: new Date().toISOString(),
+    } as Record<string, unknown>;
+
+    // Always include phone/default_address in payload to force DB update
+    // This ensures that non-empty values get persisted instead of being skipped
+
+    const { data, error } = await supabase
+        .from("users")
+        .upsert(payload, { onConflict: "id" })
+        .select()
+        .single();
+
+    if (error) {
+        throw new Error(`Failed to save contact: ${error.message}`);
+    }
+    return data as ZaloUserProfile;
 }
 
 export async function getUserProfile(userId: string): Promise<ZaloUserProfile | null> {
@@ -199,7 +253,8 @@ export async function autoLoginAndUpsert(): Promise<ZaloUserProfile | undefined>
     let phone: string | undefined;
     try {
         const pn = await getPhoneNumber();
-        phone = pn.number;
+        phone = (pn as any)?.number || (pn as any)?.phoneNumber || (pn as any)?.phone || undefined;
+        if (typeof phone === 'string') phone = phone.trim() || undefined;
     } catch { }
 
     let verified: Partial<ZaloUserProfile> | undefined;
@@ -212,12 +267,24 @@ export async function autoLoginAndUpsert(): Promise<ZaloUserProfile | undefined>
         }
     } catch { }
 
+    // Merge data with strong fallbacks (never undefined strings)
+    // Try multiple SDK field names across versions
+    const uiName = ((ui as any)?.userInfo?.name || (ui as any)?.userInfo?.displayName || '').trim();
+    const uiAvatar = ((ui as any)?.userInfo?.avatar || (ui as any)?.userInfo?.avatarUrl || (ui as any)?.userInfo?.picture || '').trim();
+    const baseName = uiName || undefined;
+    const baseAvatar = uiAvatar || undefined;
+    // Do not persist placeholder label to DB; keep undefined if SDK doesn't provide
+    const mergedName = ((verified?.name || '').trim()) || baseName || undefined;
+    const mergedAvatar = ((verified?.avatar || '').trim()) || baseAvatar || undefined;
+    const mergedPhone = ((verified?.phone || '').trim()) || phone;
+    const mergedAddress = (verified?.default_address || '').trim() || undefined;
+
     const profile: ZaloUserProfile = {
         id: ui.userInfo.id,
-        name: verified?.name ?? ui.userInfo.name,
-        avatar: verified?.avatar ?? ui.userInfo.avatar,
-        phone: verified?.phone ?? phone,
-        default_address: verified?.default_address, // Include default_address from verified data
+        name: mergedName,
+        avatar: mergedAvatar,
+        phone: mergedPhone,
+        default_address: mergedAddress,
     };
 
     console.log("📱 AutoLogin phone details:", {
@@ -228,21 +295,23 @@ export async function autoLoginAndUpsert(): Promise<ZaloUserProfile | undefined>
         phoneLength: profile.phone ? profile.phone.length : 'N/A'
     });
 
-    const upsertData = {
+    // Only include fields that are actually provided to avoid wiping existing DB values with null
+    const upsertData: Record<string, unknown> = {
         id: profile.id,
-        name: profile.name,
-        avatar: profile.avatar,
-        phone: profile.phone,
-        default_address: profile.default_address,
         updated_at: new Date().toISOString(),
     };
+    if (typeof profile.name !== 'undefined') upsertData.name = profile.name || null;
+    if (typeof profile.avatar !== 'undefined') upsertData.avatar = profile.avatar || null;
+    if (typeof profile.phone !== 'undefined') upsertData.phone = profile.phone || null;
+    if (typeof profile.default_address !== 'undefined') upsertData.default_address = profile.default_address || null;
 
-    console.log("📱 Upsert data:", upsertData);
+    console.log("📱 Upsert data (omit undefined):", upsertData);
 
-    const { data: upsertResult, error: upsertError } = await supabase.from("users").upsert(
-        upsertData,
-        { onConflict: "id" }
-    );
+    const { data: upsertResult, error: upsertError } = await supabase
+        .from("users")
+        .upsert(upsertData, { onConflict: "id" })
+        .select()
+        .single();
 
     if (upsertError) {
         console.error("Failed to upsert user to database:", upsertError);

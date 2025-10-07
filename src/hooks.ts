@@ -3,11 +3,16 @@ import { MutableRefObject, useLayoutEffect, useMemo, useState, useEffect } from 
 import toast from "react-hot-toast";
 import { UIMatch, useMatches } from "react-router-dom";
 import { cartState, cartTotalState, checkoutItemsState, selectedCartItemIdsState } from "@/state";
-import { Cart, CartItem, Product, SelectedOptions } from "types";
+import { Cart, CartItem, Product, SelectedOptions } from "@/types";
 import { getDefaultOptions, isIdentical } from "@/utils/cart";
 import { getConfig } from "@/utils/template";
 import { openChat, purchase } from "zmp-sdk";
 import { ZaloUserProfile, autoLoginAndUpsert, useAuthStatus, getUserProfile } from "@/services/auth";
+
+// Throttle backfill to avoid Zalo SDK rate limits (-1409)
+let backfillInProgress = false;
+let lastBackfillAt = 0; // ms
+const BACKFILL_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
 
 export function useRealHeight(
   element: MutableRefObject<HTMLDivElement | null>,
@@ -192,6 +197,35 @@ export function useAuth() {
         const profile = await getUserProfile(userId);
         if (profile) {
           console.log("✅ User loaded from database:", profile);
+          // If profile exists but is missing important fields, backfill from Zalo SDK via autoLoginAndUpsert
+          const isMissingKeyFields = !profile.name || !profile.phone;
+          if (isMissingKeyFields) {
+            const now = Date.now();
+            if (!backfillInProgress && now - lastBackfillAt > BACKFILL_COOLDOWN_MS) {
+              backfillInProgress = true;
+              lastBackfillAt = now;
+              console.log("ℹ️ Profile missing fields (name/phone). Attempting backfill (throttled)...");
+              try {
+                const backfilled = await autoLoginAndUpsert();
+                if (backfilled) {
+                  console.log("✅ Backfilled profile via autoLoginAndUpsert:", backfilled);
+                  const refreshed = await getUserProfile(userId);
+                  if (refreshed) {
+                    setUser(refreshed);
+                    setLoading(false);
+                    backfillInProgress = false;
+                    return;
+                  }
+                }
+              } catch (e) {
+                console.warn("⚠️ Backfill via autoLoginAndUpsert failed (will retry later).", e);
+              } finally {
+                backfillInProgress = false;
+              }
+            } else {
+              console.log("⏳ Backfill skipped due to cooldown/in-progress.");
+            }
+          }
           setUser(profile);
           setLoading(false);
           return;

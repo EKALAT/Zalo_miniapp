@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Input, Button, useSnackbar, Avatar } from 'zmp-ui';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks';
-import { useAuthStatus, updateProfile, ZaloUserProfile, autoLoginAndUpsert } from '@/services/auth';
+import { useAuthStatus, updateProfile, ZaloUserProfile, autoLoginAndUpsert, saveUserContact } from '@/services/auth';
 
 const AccountInfoPage: React.FC = () => {
     const { user, setUser, refreshUser, loading: userLoading } = useAuth();
@@ -55,44 +55,30 @@ const AccountInfoPage: React.FC = () => {
 
         setSaving(true);
         try {
-            // Prepare data - always send all fields
-            const updatedUser: Partial<ZaloUserProfile> = {
+            // Thực hiện một lần upsert cho tất cả các trường để tránh sai lệch
+            const updated = await updateProfile({
                 id: user.id,
                 name: name.trim(),
-                phone: phone.trim() || null,
-                default_address: defaultAddress.trim() || null,
-            };
-
-            console.log('💾 Saving profile to database:', updatedUser);
-            console.log('📝 Raw form data:', { name, phone, defaultAddress });
-            console.log('📱 Phone processing:', {
-                original: phone,
-                trimmed: phone.trim(),
-                final: phone.trim() || null,
-                isEmpty: phone.trim() === ''
+                phone: phone.trim(),
+                default_address: defaultAddress?.trim() || undefined,
             });
 
-            // Update profile in database
-            const updatedProfile = await updateProfile(updatedUser);
+            console.log('✅ Profile saved to database successfully:', updated);
 
-            console.log('✅ Profile saved to database successfully:', updatedProfile);
+            // Update local state ngay lập tức
+            setUser(updated);
 
-            // Update local state immediately
-            setUser(updatedProfile);
-
-            // Dispatch event to notify other components
+            // Thông báo cho các component khác
             window.dispatchEvent(new CustomEvent('user-updated'));
 
-            // Show success message
             openSnackbar({
                 text: `✅ Đã lưu thông tin thành công! Thông tin đã được cập nhật trong trang thành viên.`,
                 type: 'success',
             });
 
-            // Navigate back to profile page to show updated info
             setTimeout(() => {
                 navigate('/profile');
-            }, 1500);
+            }, 1200);
 
         } catch (error) {
             console.error('❌ Failed to save profile to database:', error);

@@ -70,8 +70,13 @@ export default function CheckoutPage() {
 
         setLoading(true);
         try {
-            // Get user ID from localStorage or auth context
-            const userId = localStorage.getItem("zma_user_id") || "temp_user";
+            // Lấy userId thực từ context hoặc localStorage; không dùng temp_user
+            const userId = user?.id || localStorage.getItem("zma_user_id");
+            if (!userId) {
+                toast.error("Không tìm thấy người dùng. Vui lòng đăng nhập lại.");
+                setLoading(false);
+                return;
+            }
 
             console.log("Creating order with:", { userId, checkoutItems, formData });
 
