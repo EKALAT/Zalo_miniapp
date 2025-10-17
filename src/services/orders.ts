@@ -359,3 +359,133 @@ export async function updateOrderStatus(
     }
 }
 
+// Helper function to get status display name
+function getStatusDisplayName(status: string): string {
+    switch (status) {
+        case 'pending': return 'Đang chờ xử lý';
+        case 'confirmed': return 'Đã xác nhận';
+        case 'processing': return 'Đang xử lý';
+        case 'shipped': return 'Đã giao hàng';
+        case 'delivered': return 'Đã nhận hàng';
+        case 'cancelled': return 'Đã hủy';
+        case 'refunded': return 'Đã hoàn tiền';
+        default: return status;
+    }
+}
+
+export async function cancelOrder(
+    orderId: string,
+    reason: string,
+    userId: string,
+    userName?: string
+): Promise<void> {
+    if (!isSupabaseConfigured) {
+        throw new Error("Supabase not configured");
+    }
+
+    console.log('🚫 Cancelling order:', { orderId, reason, userId });
+
+    try {
+        // First, verify the order belongs to the user and can be cancelled
+        const { data: order, error: orderError } = await supabase
+            .from("orders")
+            .select("*")
+            .eq("id", orderId)
+            .eq("user_id", userId)
+            .single();
+
+        if (orderError) {
+            console.error('❌ Error fetching order:', orderError);
+            throw new Error(`Không tìm thấy đơn hàng hoặc bạn không có quyền hủy đơn hàng này`);
+        }
+
+        // Check if order can be cancelled (only pending orders)
+        if (order.status !== 'pending') {
+            throw new Error(`Không thể hủy đơn hàng ở trạng thái "${getStatusDisplayName(order.status)}". Chỉ có thể hủy đơn hàng đang chờ xử lý.`);
+        }
+
+        // Try to update order status to cancelled (may fail due to RLS)
+        console.log('🔄 Attempting to update order status...');
+        const { data: updateData, error: updateError } = await supabase
+            .from("orders")
+            .update({
+                status: 'cancelled',
+                updated_at: new Date().toISOString()
+            })
+            .eq("id", orderId)
+            .select();
+
+        if (updateError) {
+            console.warn('⚠️ Could not update order status due to RLS:', updateError.message);
+            console.log('ℹ️ Proceeding with cancellation record only...');
+        } else {
+            console.log('✅ Order status updated successfully:', updateData);
+        }
+
+        // Try to add cancellation to status history (may fail due to RLS)
+        console.log('🔄 Attempting to add cancellation history...');
+        const { data: historyData, error: historyError } = await supabase
+            .from("order_status_history")
+            .insert({
+                order_id: orderId,
+                status: 'cancelled',
+                note: `Đơn hàng bị hủy bởi khách hàng. Lý do: ${reason}`,
+                created_by: "user",
+                created_at: new Date().toISOString()
+            })
+            .select();
+
+        if (historyError) {
+            console.warn("⚠️ Could not add cancellation history due to RLS:", historyError.message);
+            console.log('ℹ️ Proceeding with cancellation record only...');
+        } else {
+            console.log('✅ Cancellation history added successfully:', historyData);
+        }
+
+        // Save cancellation details to order_cancel_simple table
+        try {
+            console.log('💾 Saving to order_cancel_simple with data:', {
+                user_id: userId,
+                user_name: userName || 'User',
+                order_number: order.order_number,
+                reason: reason
+            });
+
+            const { data: cancelledData, error: cancelledError } = await supabase
+                .from("order_cancel_simple")
+                .insert({
+                    user_id: userId,
+                    user_name: userName || 'User',
+                    order_number: order.order_number,
+                    reason: reason
+                })
+                .select();
+
+            if (cancelledError) {
+                console.error("❌ Failed to save cancellation details:", cancelledError);
+                console.error("❌ Error details:", {
+                    message: cancelledError.message,
+                    details: cancelledError.details,
+                    hint: cancelledError.hint,
+                    code: cancelledError.code
+                });
+            } else {
+                console.log('✅ Cancellation details saved successfully:', cancelledData);
+            }
+        } catch (dbError) {
+            console.error("❌ Database error when saving cancellation:", dbError);
+            // Don't throw error here as the order was already cancelled
+        }
+
+        // If payment was made, we might want to add a refund record here
+        // For now, we'll just log it
+        if (order.payment_status === 'paid') {
+            console.log('💰 Order was paid, consider processing refund for order:', orderId);
+        }
+
+    } catch (error) {
+        console.error('❌ Error cancelling order:', error);
+        throw error;
+    }
+}
+

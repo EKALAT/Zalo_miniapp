@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useSnackbar } from 'zmp-ui';
 import { useNavigate } from 'react-router-dom';
-import { getUserOrdersWithItems, Order } from '@/services/orders';
+import toast from 'react-hot-toast';
+import { getUserOrdersWithItems, Order, cancelOrder } from '@/services/orders';
 import { useAuth } from '@/hooks';
 import { useAuthStatus } from '@/services/auth';
 import { formatPrice, formatDate, APP_TIME_ZONE } from '@/utils/format';
+import CancelOrderModal from '@/components/cancel-order-modal';
 
 interface OrderWithItems extends Order {
     items: Array<{
@@ -26,6 +28,9 @@ const OrderTrackingPage: React.FC = () => {
     const [orders, setOrders] = useState<OrderWithItems[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [cancelModalOpen, setCancelModalOpen] = useState(false);
+    const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+    const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null);
 
 
     useEffect(() => {
@@ -108,6 +113,82 @@ const OrderTrackingPage: React.FC = () => {
         }
     };
 
+    const canCancelOrder = (status: Order['status']) => {
+        return status === 'pending';
+    };
+
+    const handleCancelOrder = (orderId: string) => {
+        setSelectedOrderId(orderId);
+        setCancelModalOpen(true);
+    };
+
+    const handleConfirmCancel = async (reason: string) => {
+        if (!selectedOrderId || !user) return;
+
+        console.log('🚀 Starting cancel order process...', { selectedOrderId, reason, userId: user.id });
+        setCancellingOrderId(selectedOrderId);
+
+        try {
+            console.log('📡 Calling cancelOrder API...');
+            await cancelOrder(selectedOrderId, reason, user.id, user.name);
+
+            console.log('✅ cancelOrder API completed successfully');
+
+            // Show success notification
+            console.log('📢 Showing success notification...');
+
+            // Try snackbar first, fallback to toast
+            try {
+                openSnackbar({
+                    text: 'Đã gửi yêu cầu hủy đơn hàng thành công!',
+                    type: 'success'
+                });
+            } catch (e) {
+                // Fallback to toast
+                toast.success('Đã gửi yêu cầu hủy đơn hàng thành công!');
+            }
+
+            console.log('🔄 Refreshing orders list...');
+            // Refresh orders list
+            try {
+                const userOrdersWithItems = await getUserOrdersWithItems(user.id);
+                const activeOrders = userOrdersWithItems.filter(order =>
+                    order.status !== 'delivered' &&
+                    order.status !== 'cancelled' &&
+                    order.status !== 'refunded'
+                );
+                setOrders(activeOrders);
+                console.log('✅ Orders list refreshed');
+            } catch (refreshError) {
+                console.warn('⚠️ Could not refresh orders list:', refreshError);
+                console.log('ℹ️ Cancellation was successful, but could not refresh list');
+                // Don't throw error here as cancellation was successful
+            }
+
+        } catch (error) {
+            console.error('❌ Error cancelling order:', error);
+
+            // Try snackbar first, fallback to toast
+            try {
+                openSnackbar({
+                    text: 'Lỗi khi gửi yêu cầu hủy đơn hàng!',
+                    type: 'error'
+                });
+            } catch (e) {
+                // Fallback to toast
+                toast.error('Lỗi khi gửi yêu cầu hủy đơn hàng!');
+            }
+        } finally {
+            console.log('🏁 Cancel process finished');
+            setCancellingOrderId(null);
+        }
+    };
+
+    const handleCloseCancelModal = () => {
+        setCancelModalOpen(false);
+        setSelectedOrderId(null);
+    };
+
 
     if (loading) {
         return (
@@ -183,42 +264,90 @@ const OrderTrackingPage: React.FC = () => {
                                                 {getStatusIcon(order.status)} {getStatusDisplayName(order.status)}
                                             </span>
 
-                                            {/* Status display only - no action buttons */}
+                                            {/* Action buttons */}
                                             <div className="flex gap-2">
-                                                {/* Thông báo cho các trạng thái */}
-                                                {order.status === 'pending' && (
-                                                    <div className="inline-flex items-center px-3 py-2 bg-yellow-100 text-yellow-700 text-sm font-medium rounded-lg">
-                                                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                        </svg>
-                                                        Đang chờ xử lý
-                                                    </div>
+                                                {/* Cancel button for eligible orders */}
+                                                {canCancelOrder(order.status) && (
+                                                    <button
+                                                        onClick={() => handleCancelOrder(order.id)}
+                                                        disabled={cancellingOrderId === order.id}
+                                                        className="inline-flex items-center px-3 py-2 bg-red-100 hover:bg-red-200 text-red-700 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    >
+                                                        {cancellingOrderId === order.id ? (
+                                                            <>
+                                                                <svg className="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
+                                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                                </svg>
+                                                                Đang hủy...
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                                </svg>
+                                                                Gửi yêu cầu hủy
+                                                            </>
+                                                        )}
+                                                    </button>
                                                 )}
 
-                                                {order.status === 'confirmed' && (
-                                                    <div className="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-700 text-sm font-medium rounded-lg">
-                                                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                        </svg>
-                                                        Đã xác nhận
-                                                    </div>
-                                                )}
+                                                {/* Status display for non-cancellable orders */}
+                                                {!canCancelOrder(order.status) && (
+                                                    <div className="flex gap-2">
+                                                        {order.status === 'confirmed' && (
+                                                            <div className="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-700 text-sm font-medium rounded-lg">
+                                                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                </svg>
+                                                                Đã xác nhận
+                                                            </div>
+                                                        )}
 
-                                                {order.status === 'processing' && (
-                                                    <div className="inline-flex items-center px-3 py-2 bg-purple-100 text-purple-700 text-sm font-medium rounded-lg">
-                                                        <svg className="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                                        </svg>
-                                                        Đang xử lý
-                                                    </div>
-                                                )}
+                                                        {order.status === 'processing' && (
+                                                            <div className="inline-flex items-center px-3 py-2 bg-purple-100 text-purple-700 text-sm font-medium rounded-lg">
+                                                                <svg className="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                                                </svg>
+                                                                Đang xử lý
+                                                            </div>
+                                                        )}
 
-                                                {order.status === 'shipped' && (
-                                                    <div className="inline-flex items-center px-3 py-2 bg-indigo-100 text-indigo-700 text-sm font-medium rounded-lg">
-                                                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                                        </svg>
-                                                        Đã giao hàng
+                                                        {order.status === 'shipped' && (
+                                                            <div className="inline-flex items-center px-3 py-2 bg-indigo-100 text-indigo-700 text-sm font-medium rounded-lg">
+                                                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                                                </svg>
+                                                                Đã giao hàng
+                                                            </div>
+                                                        )}
+
+                                                        {order.status === 'delivered' && (
+                                                            <div className="inline-flex items-center px-3 py-2 bg-green-100 text-green-700 text-sm font-medium rounded-lg">
+                                                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                                </svg>
+                                                                Đã nhận hàng
+                                                            </div>
+                                                        )}
+
+                                                        {order.status === 'cancelled' && (
+                                                            <div className="inline-flex items-center px-3 py-2 bg-red-100 text-red-700 text-sm font-medium rounded-lg">
+                                                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                                </svg>
+                                                                Đã hủy
+                                                            </div>
+                                                        )}
+
+                                                        {order.status === 'refunded' && (
+                                                            <div className="inline-flex items-center px-3 py-2 bg-orange-100 text-orange-700 text-sm font-medium rounded-lg">
+                                                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                                                                </svg>
+                                                                Đã hoàn tiền
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 )}
                                             </div>
@@ -339,6 +468,14 @@ const OrderTrackingPage: React.FC = () => {
                 </div>
             </div>
 
+            {/* Cancel Order Modal */}
+            <CancelOrderModal
+                isOpen={cancelModalOpen}
+                onClose={handleCloseCancelModal}
+                onConfirm={handleConfirmCancel}
+                orderNumber={selectedOrderId ? orders.find(o => o.id === selectedOrderId)?.order_number || '' : ''}
+                loading={cancellingOrderId === selectedOrderId}
+            />
         </div>
     );
 };
