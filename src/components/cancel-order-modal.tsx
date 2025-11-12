@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSnackbar } from 'zmp-ui';
 
 interface CancelOrderModalProps {
@@ -18,7 +18,17 @@ const CancelOrderModal: React.FC<CancelOrderModalProps> = ({
 }) => {
     const [reason, setReason] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSubmitted, setIsSubmitted] = useState(false);
     const { openSnackbar } = useSnackbar();
+
+    // Reset state khi modal mở lại
+    useEffect(() => {
+        if (isOpen) {
+            setReason('');
+            setIsSubmitting(false);
+            setIsSubmitted(false);
+        }
+    }, [isOpen]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -42,18 +52,23 @@ const CancelOrderModal: React.FC<CancelOrderModalProps> = ({
         setIsSubmitting(true);
         try {
             await onConfirm(reason.trim());
+            setIsSubmitted(true);
             setReason('');
-            onClose();
+            // Hiển thị "Đã gửi" trong 1.5 giây trước khi đóng modal
+            setTimeout(() => {
+                onClose();
+                setIsSubmitted(false);
+            }, 1500);
         } catch (error) {
             console.error('Error cancelling order:', error);
-        } finally {
             setIsSubmitting(false);
         }
     };
 
     const handleClose = () => {
-        if (!isSubmitting) {
+        if (!isSubmitting && !isSubmitted) {
             setReason('');
+            setIsSubmitted(false);
             onClose();
         }
     };
@@ -71,7 +86,7 @@ const CancelOrderModal: React.FC<CancelOrderModalProps> = ({
                         </h3>
                         <button
                             onClick={handleClose}
-                            disabled={isSubmitting}
+                            disabled={isSubmitting || isSubmitted}
                             className="text-gray-400 hover:text-gray-600 disabled:opacity-50"
                         >
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -107,7 +122,7 @@ const CancelOrderModal: React.FC<CancelOrderModalProps> = ({
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary resize-none"
                                 rows={4}
                                 maxLength={500}
-                                disabled={isSubmitting}
+                                disabled={isSubmitting || isSubmitted}
                                 required
                             />
                             <div className="flex justify-between items-center mt-1">
@@ -138,7 +153,7 @@ const CancelOrderModal: React.FC<CancelOrderModalProps> = ({
                                         key={commonReason}
                                         type="button"
                                         onClick={() => setReason(commonReason)}
-                                        disabled={isSubmitting}
+                                        disabled={isSubmitting || isSubmitted}
                                         className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded text-gray-700 disabled:opacity-50"
                                     >
                                         {commonReason}
@@ -152,17 +167,28 @@ const CancelOrderModal: React.FC<CancelOrderModalProps> = ({
                             <button
                                 type="button"
                                 onClick={handleClose}
-                                disabled={isSubmitting}
+                                disabled={isSubmitting || isSubmitted}
                                 className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium disabled:opacity-50"
                             >
                                 Hủy
                             </button>
                             <button
                                 type="submit"
-                                disabled={isSubmitting || !reason.trim() || reason.trim().length < 10}
-                                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium disabled:opacity-50 flex items-center justify-center"
+                                disabled={isSubmitting || isSubmitted || !reason.trim() || reason.trim().length < 10}
+                                className={`flex-1 px-4 py-2 text-white rounded-lg font-medium disabled:opacity-50 flex items-center justify-center ${
+                                    isSubmitted 
+                                        ? 'bg-green-600 hover:bg-green-700' 
+                                        : 'bg-red-600 hover:bg-red-700'
+                                }`}
                             >
-                                {isSubmitting ? (
+                                {isSubmitted ? (
+                                    <>
+                                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        Đã gửi
+                                    </>
+                                ) : isSubmitting ? (
                                     <>
                                         <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

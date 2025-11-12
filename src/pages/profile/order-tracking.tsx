@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSnackbar } from 'zmp-ui';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { getUserOrdersWithItems, Order, cancelOrder } from '@/services/orders';
+import { getUserOrdersWithItems, Order, cancelOrder, hasCancelRequest } from '@/services/orders';
 import { useAuth } from '@/hooks';
 import { useAuthStatus } from '@/services/auth';
 import { formatPrice, formatDate, APP_TIME_ZONE } from '@/utils/format';
@@ -31,6 +31,7 @@ const OrderTrackingPage: React.FC = () => {
     const [cancelModalOpen, setCancelModalOpen] = useState(false);
     const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
     const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null);
+    const [ordersWithCancelRequest, setOrdersWithCancelRequest] = useState<Set<string>>(new Set());
 
 
     useEffect(() => {
@@ -61,6 +62,24 @@ const OrderTrackingPage: React.FC = () => {
                 );
 
                 setOrders(activeOrders);
+
+                // Kiểm tra các đơn hàng đã có yêu cầu hủy từ database
+                const cancelRequestSet = new Set<string>();
+                await Promise.all(
+                    activeOrders.map(async (order) => {
+                        const hasRequest = await hasCancelRequest(order.order_number);
+                        if (hasRequest) {
+                            cancelRequestSet.add(order.order_number);
+                        }
+                    })
+                );
+                // Merge với state hiện tại để giữ lại các yêu cầu đã gửi trước đó
+                setOrdersWithCancelRequest(prev => {
+                    const mergedSet = new Set(prev);
+                    cancelRequestSet.forEach(orderNumber => mergedSet.add(orderNumber));
+                    console.log('📋 Cancel requests loaded:', Array.from(mergedSet));
+                    return mergedSet;
+                });
             } catch (err) {
                 setError(`Lỗi: ${err}`);
             } finally {
@@ -118,6 +137,22 @@ const OrderTrackingPage: React.FC = () => {
     };
 
     const handleCancelOrder = (orderId: string) => {
+        const order = orders.find(o => o.id === orderId);
+        if (!order) return;
+
+        // Kiểm tra xem đã gửi yêu cầu hủy chưa
+        if (ordersWithCancelRequest.has(order.order_number)) {
+            try {
+                openSnackbar({
+                    text: 'Bạn đã gửi yêu cầu hủy đơn hàng này rồi. Vui lòng chờ admin xử lý.',
+                    type: 'warning'
+                });
+            } catch (e) {
+                toast.info('Bạn đã gửi yêu cầu hủy đơn hàng này rồi. Vui lòng chờ admin xử lý.');
+            }
+            return;
+        }
+
         setSelectedOrderId(orderId);
         setCancelModalOpen(true);
     };
@@ -125,14 +160,25 @@ const OrderTrackingPage: React.FC = () => {
     const handleConfirmCancel = async (reason: string) => {
         if (!selectedOrderId || !user) return;
 
-        console.log('🚀 Starting cancel order process...', { selectedOrderId, reason, userId: user.id });
+        const selectedOrder = orders.find(o => o.id === selectedOrderId);
+        if (!selectedOrder) return;
+
+        console.log('🚀 Starting cancel request process...', { selectedOrderId, reason, userId: user.id, orderNumber: selectedOrder.order_number });
         setCancellingOrderId(selectedOrderId);
 
         try {
             console.log('📡 Calling cancelOrder API...');
             await cancelOrder(selectedOrderId, reason, user.id, user.name);
 
-            console.log('✅ cancelOrder API completed successfully');
+            console.log('✅ Cancel request submitted successfully');
+
+            // Đánh dấu đơn hàng đã có yêu cầu hủy (KHÔNG đổi status) - giữ lại vĩnh viễn
+            setOrdersWithCancelRequest(prev => {
+                const newSet = new Set(prev);
+                newSet.add(selectedOrder.order_number);
+                console.log('✅ Updated cancel requests set:', Array.from(newSet));
+                return newSet;
+            });
 
             // Show success notification
             console.log('📢 Showing success notification...');
@@ -140,46 +186,31 @@ const OrderTrackingPage: React.FC = () => {
             // Try snackbar first, fallback to toast
             try {
                 openSnackbar({
-                    text: 'Đã gửi yêu cầu hủy đơn hàng thành công!',
+                    text: 'Đã gửi yêu cầu hủy đơn hàng thành công! Vui lòng chờ admin xử lý.',
                     type: 'success'
                 });
             } catch (e) {
                 // Fallback to toast
-                toast.success('Đã gửi yêu cầu hủy đơn hàng thành công!');
-            }
-
-            console.log('🔄 Refreshing orders list...');
-            // Refresh orders list
-            try {
-                const userOrdersWithItems = await getUserOrdersWithItems(user.id);
-                const activeOrders = userOrdersWithItems.filter(order =>
-                    order.status !== 'delivered' &&
-                    order.status !== 'cancelled' &&
-                    order.status !== 'refunded'
-                );
-                setOrders(activeOrders);
-                console.log('✅ Orders list refreshed');
-            } catch (refreshError) {
-                console.warn('⚠️ Could not refresh orders list:', refreshError);
-                console.log('ℹ️ Cancellation was successful, but could not refresh list');
-                // Don't throw error here as cancellation was successful
+                toast.success('Đã gửi yêu cầu hủy đơn hàng thành công! Vui lòng chờ admin xử lý.');
             }
 
         } catch (error) {
-            console.error('❌ Error cancelling order:', error);
+            console.error('❌ Error submitting cancel request:', error);
+
+            const errorMessage = error instanceof Error ? error.message : 'Lỗi khi gửi yêu cầu hủy đơn hàng!';
 
             // Try snackbar first, fallback to toast
             try {
                 openSnackbar({
-                    text: 'Lỗi khi gửi yêu cầu hủy đơn hàng!',
+                    text: errorMessage,
                     type: 'error'
                 });
             } catch (e) {
                 // Fallback to toast
-                toast.error('Lỗi khi gửi yêu cầu hủy đơn hàng!');
+                toast.error(errorMessage);
             }
         } finally {
-            console.log('🏁 Cancel process finished');
+            console.log('🏁 Cancel request process finished');
             setCancellingOrderId(null);
         }
     };
@@ -266,8 +297,16 @@ const OrderTrackingPage: React.FC = () => {
 
                                             {/* Action buttons */}
                                             <div className="flex gap-2">
-                                                {/* Cancel button for eligible orders */}
-                                                {canCancelOrder(order.status) && (
+                                                {/* Hiển thị "Đã gửi yêu cầu hủy" nếu đã gửi */}
+                                                {canCancelOrder(order.status) && ordersWithCancelRequest.has(order.order_number) ? (
+                                                    <div className="inline-flex items-center px-3 py-2 bg-orange-100 text-orange-700 text-sm font-medium rounded-lg">
+                                                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        </svg>
+                                                        Đã gửi yêu cầu hủy
+                                                    </div>
+                                                ) : canCancelOrder(order.status) ? (
+                                                    /* Cancel button for eligible orders */
                                                     <button
                                                         onClick={() => handleCancelOrder(order.id)}
                                                         disabled={cancellingOrderId === order.id}
@@ -279,7 +318,7 @@ const OrderTrackingPage: React.FC = () => {
                                                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                                                 </svg>
-                                                                Đang hủy...
+                                                                Đang gửi...
                                                             </>
                                                         ) : (
                                                             <>
@@ -290,7 +329,7 @@ const OrderTrackingPage: React.FC = () => {
                                                             </>
                                                         )}
                                                     </button>
-                                                )}
+                                                ) : null}
 
                                                 {/* Status display for non-cancellable orders */}
                                                 {!canCancelOrder(order.status) && (

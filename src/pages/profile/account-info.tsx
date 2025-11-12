@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Input, Button, useSnackbar, Avatar } from 'zmp-ui';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks';
-import { useAuthStatus, updateProfile, ZaloUserProfile, autoLoginAndUpsert, saveUserContact } from '@/services/auth';
+import { zaloUserService } from '@/services/zalo-auth';
 
 const AccountInfoPage: React.FC = () => {
-    const { user, setUser, refreshUser, loading: userLoading } = useAuth();
-    const loggedIn = useAuthStatus();
+    const { user, setUser, refreshUser, loading: userLoading, loggedIn, sessionActive, updateProfile } = useAuth();
     const navigate = useNavigate();
     const { openSnackbar } = useSnackbar();
 
@@ -14,22 +13,25 @@ const AccountInfoPage: React.FC = () => {
     const [phone, setPhone] = useState(user?.phone || '');
     const [defaultAddress, setDefaultAddress] = useState(user?.default_address || '');
     const [saving, setSaving] = useState(false);
+    const [fetchingPhone, setFetchingPhone] = useState(false);
+    const [formTouched, setFormTouched] = useState(false);
 
     useEffect(() => {
-        if (!loggedIn) {
+        if (!sessionActive) {
             openSnackbar({
                 text: 'Bạn cần đăng nhập để xem thông tin tài khoản.',
                 type: 'warning',
             });
             navigate('/profile');
         }
-    }, [loggedIn, navigate, openSnackbar]);
+    }, [sessionActive, navigate, openSnackbar]);
 
     useEffect(() => {
         if (user) {
             setName(user.name || '');
             setPhone(user.phone || '');
             setDefaultAddress(user.default_address || '');
+            setFormTouched(false);
         }
     }, [user]);
 
@@ -70,6 +72,8 @@ const AccountInfoPage: React.FC = () => {
 
             // Thông báo cho các component khác
             window.dispatchEvent(new CustomEvent('user-updated'));
+            await refreshUser();
+            setFormTouched(false);
 
             openSnackbar({
                 text: `✅ Đã lưu thông tin thành công! Thông tin đã được cập nhật trong trang thành viên.`,
@@ -91,7 +95,35 @@ const AccountInfoPage: React.FC = () => {
         }
     };
 
-    if (!loggedIn || userLoading) {
+    const handleFetchPhone = async () => {
+        setFetchingPhone(true);
+        try {
+            const fetchedPhone = await zaloUserService.requestPhoneNumber();
+            if (fetchedPhone) {
+                setPhone(fetchedPhone);
+                setFormTouched(true);
+                openSnackbar({
+                    text: '✅ Đã lấy số điện thoại từ Zalo',
+                    type: 'success',
+                });
+            } else {
+                openSnackbar({
+                    text: 'Không thể lấy số điện thoại. Bạn có thể nhập thủ công.',
+                    type: 'warning',
+                });
+            }
+        } catch (error) {
+            console.error('❌ Failed to request phone number:', error);
+            openSnackbar({
+                text: 'Không thể lấy số điện thoại. Vui lòng kiểm tra quyền truy cập.',
+                type: 'error',
+            });
+        } finally {
+            setFetchingPhone(false);
+        }
+    };
+
+    if (!sessionActive || userLoading) {
         return (
             <div className="min-h-screen bg-white flex items-center justify-center">
                 <div className="text-center">
@@ -150,23 +182,42 @@ const AccountInfoPage: React.FC = () => {
                         label="Tên của bạn *"
                         type="text"
                         value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        onChange={(e) => {
+                            setName(e.target.value);
+                            setFormTouched(true);
+                        }}
                         className="mb-4"
                         placeholder="Nhập tên của bạn"
                     />
-                    <Input
-                        label="Số điện thoại *"
-                        type="tel"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        className="mb-4"
-                        placeholder="Nhập số điện thoại"
-                    />
+                    <div className="mb-4 space-y-2">
+                        <Input
+                            label="Số điện thoại *"
+                            type="tel"
+                            value={phone}
+                            onChange={(e) => {
+                                setPhone(e.target.value);
+                                setFormTouched(true);
+                            }}
+                            placeholder="Nhập số điện thoại"
+                        />
+                        <Button
+                            variant="secondary"
+                            fullWidth
+                            size="small"
+                            onClick={handleFetchPhone}
+                            loading={fetchingPhone}
+                        >
+                            Lấy số điện thoại từ Zalo
+                        </Button>
+                    </div>
                     <div>
                         <label className="block text-sm font-medium mb-1">Địa chỉ nhận hàng mặc định</label>
                         <textarea
                             value={defaultAddress}
-                            onChange={(e) => setDefaultAddress(e.target.value)}
+                            onChange={(e) => {
+                                setDefaultAddress(e.target.value);
+                                setFormTouched(true);
+                            }}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                             placeholder="Nhập địa chỉ nhận hàng mặc định"
                             rows={3}
@@ -182,7 +233,7 @@ const AccountInfoPage: React.FC = () => {
                     className="mt-8"
                     onClick={handleUpdateProfile}
                     loading={saving}
-                    disabled={saving}
+                    disabled={saving || !formTouched}
                 >
                     Cập nhật thông tin
                 </Button>

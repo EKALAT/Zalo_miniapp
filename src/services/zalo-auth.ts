@@ -41,56 +41,64 @@ async function ensureUserId(): Promise<string> {
 export const zaloUserService = {
     // Đăng nhập + lấy thông tin
     async login(): Promise<AppUser | null> {
-        // 1) Thử flow auto (nếu bạn đã có backend xác thực)
+        let profile: AppUser | undefined;
+
         try {
-            const profile = await autoLoginAndUpsert();
+            profile = await autoLoginAndUpsert();
             if (profile?.id) {
                 try { localStorage.setItem(USER_ID_KEY, profile.id); } catch { }
             }
-            return profile || null;
         } catch {
-            // 2) Fallback: luôn lấy ID chắc chắn trước
-            const id = await ensureUserId();
+            // ignore here, we will attempt the manual flow below
+        }
 
-            // 3) Kiểm tra quyền userInfo; nếu thiếu thì xin quyền
+        const needsBackfill =
+            !profile ||
+            !profile.name ||
+            !profile.avatar;
+
+        if (!needsBackfill && profile) {
+            return profile;
+        }
+
+        // Manual flow to request permissions and ensure data
+        const id = profile?.id || (await ensureUserId());
+
+        try {
+            const { authSetting } = await getSetting();
+            const hasUserInfo = !!authSetting?.["scope.userInfo"];
+
+            if (!hasUserInfo) {
+                await authorize({ scopes: ["scope.userInfo"] });
+            }
+
+            const { userInfo } = await getUserInfo({
+                autoRequestPermission: true,
+                avatarType: "normal",
+            });
+
             try {
-                const { authSetting } = await getSetting();
-                const hasUserInfo = !!authSetting?.["scope.userInfo"];
-
-                if (!hasUserInfo) {
-                    // Người dùng có thể từ chối -> bắt lỗi -201 theo docs authorize
-                    await authorize({ scopes: ["scope.userInfo"] });
-                }
-
-                // 4) Gọi getUserInfo; autoRequestPermission=true để tự bật consent nếu cần
-                const { userInfo } = await getUserInfo({
-                    autoRequestPermission: true,
-                    avatarType: "normal",
-                });
-
-                // 5) Upsert tên + avatar vào DB (không chặn nếu thất bại)
-                try {
-                    await updateProfile({
-                        id,
-                        name: userInfo.name,
-                        avatar: userInfo.avatar,
-                    } as Partial<AppUser>);
-                } catch { }
-
-                return {
+                await updateProfile({
                     id,
                     name: userInfo.name,
                     avatar: userInfo.avatar,
-                } as AppUser;
-            } catch (e: any) {
-                // Người dùng từ chối cung cấp tên/avatar: SDK trả về -1401 theo docs getUserInfo
-                // => vẫn trả về tối thiểu AppUser với id
-                return {
-                    id,
-                    name: undefined,
-                    avatar: undefined,
-                } as AppUser;
-            }
+                } as Partial<AppUser>);
+            } catch { }
+
+            try { localStorage.setItem(USER_ID_KEY, id); } catch { }
+
+            return {
+                id,
+                name: userInfo.name,
+                avatar: userInfo.avatar,
+            } as AppUser;
+        } catch {
+            try { localStorage.setItem(USER_ID_KEY, id); } catch { }
+            return profile || {
+                id,
+                name: undefined,
+                avatar: undefined,
+            } as AppUser;
         }
     },
 

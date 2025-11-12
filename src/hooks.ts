@@ -1,5 +1,5 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { MutableRefObject, useLayoutEffect, useMemo, useState, useEffect } from "react";
+import { MutableRefObject, useLayoutEffect, useMemo, useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
 import { UIMatch, useMatches } from "react-router-dom";
 import { cartState, cartTotalState, checkoutItemsState, selectedCartItemIdsState } from "@/state";
@@ -7,12 +7,8 @@ import { Cart, CartItem, Product, SelectedOptions } from "@/types";
 import { getDefaultOptions, isIdentical } from "@/utils/cart";
 import { getConfig } from "@/utils/template";
 import { openChat, purchase } from "zmp-sdk";
-import { ZaloUserProfile, autoLoginAndUpsert, useAuthStatus, getUserProfile } from "@/services/auth";
-
-// Throttle backfill to avoid Zalo SDK rate limits (-1409)
-let backfillInProgress = false;
-let lastBackfillAt = 0; // ms
-const BACKFILL_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
+import { useZaloAuth } from "@/hooks/use-zalo-auth";
+export { useZaloAuth } from "@/hooks/use-zalo-auth";
 
 export function useRealHeight(
   element: MutableRefObject<HTMLDivElement | null>,
@@ -172,106 +168,29 @@ export function useRouteHandle() {
 }
 
 export function useAuth() {
-  const [user, setUser] = useState<ZaloUserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const loggedIn = useAuthStatus();
+  const {
+    user,
+    setUser,
+    refreshUser,
+    isLoading,
+    login,
+    logout,
+    updateProfile,
+    isLoggedIn,
+    sessionActive,
+    error,
+  } = useZaloAuth();
 
-  // Function to refresh user data from database
-  const refreshUser = async () => {
-    if (!loggedIn) {
-      setUser(null);
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-    const userId = localStorage.getItem("zma_user_id");
-
-    console.log("🔄 Refreshing user data...");
-    console.log("User ID from localStorage:", userId);
-    console.log("Logged in status:", loggedIn);
-
-    if (userId) {
-      try {
-        console.log("📡 Loading user from database with ID:", userId);
-        const profile = await getUserProfile(userId);
-        if (profile) {
-          console.log("✅ User loaded from database:", profile);
-          // If profile exists but is missing important fields, backfill from Zalo SDK via autoLoginAndUpsert
-          const isMissingKeyFields = !profile.name || !profile.phone;
-          if (isMissingKeyFields) {
-            const now = Date.now();
-            if (!backfillInProgress && now - lastBackfillAt > BACKFILL_COOLDOWN_MS) {
-              backfillInProgress = true;
-              lastBackfillAt = now;
-              console.log("ℹ️ Profile missing fields (name/phone). Attempting backfill (throttled)...");
-              try {
-                const backfilled = await autoLoginAndUpsert();
-                if (backfilled) {
-                  console.log("✅ Backfilled profile via autoLoginAndUpsert:", backfilled);
-                  const refreshed = await getUserProfile(userId);
-                  if (refreshed) {
-                    setUser(refreshed);
-                    setLoading(false);
-                    backfillInProgress = false;
-                    return;
-                  }
-                }
-              } catch (e) {
-                console.warn("⚠️ Backfill via autoLoginAndUpsert failed (will retry later).", e);
-              } finally {
-                backfillInProgress = false;
-              }
-            } else {
-              console.log("⏳ Backfill skipped due to cooldown/in-progress.");
-            }
-          }
-          setUser(profile);
-          setLoading(false);
-          return;
-        } else {
-          console.log("⚠️ No profile found in database for ID:", userId);
-        }
-      } catch (error) {
-        console.error('❌ Failed to load user from database:', error);
-      }
-    } else {
-      console.log("⚠️ No user ID found in localStorage");
-    }
-
-    // Fallback to autoLoginAndUpsert if no user ID or database load failed
-    try {
-      console.log("🔄 Falling back to autoLoginAndUpsert");
-      const profile = await autoLoginAndUpsert();
-      if (profile) {
-        console.log("✅ User loaded via autoLoginAndUpsert:", profile);
-        setUser(profile);
-      } else {
-        console.log("❌ No profile returned from autoLoginAndUpsert");
-        setUser(null);
-      }
-    } catch (error) {
-      console.error('❌ Failed to load user via autoLoginAndUpsert:', error);
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
+  return {
+    user,
+    setUser,
+    refreshUser,
+    loading: isLoading,
+    login,
+    logout,
+    updateProfile,
+    loggedIn: isLoggedIn,
+    sessionActive,
+    error,
   };
-
-  // Listen for custom events to refresh user data
-  useEffect(() => {
-    const handleUserUpdate = () => {
-      console.log("🔄 User update event received, refreshing...");
-      refreshUser();
-    };
-
-    window.addEventListener('user-updated', handleUserUpdate);
-    return () => window.removeEventListener('user-updated', handleUserUpdate);
-  }, [loggedIn]);
-
-  useEffect(() => {
-    refreshUser();
-  }, [loggedIn]);
-
-  return { user, setUser, refreshUser, loading };
 }

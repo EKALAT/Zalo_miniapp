@@ -1,15 +1,9 @@
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { getUserInfo, getPhoneNumber, login } from "zmp-sdk";
 import { useEffect, useState } from "react";
+import { ZaloUserProfile } from "@/types/auth";
 
-export interface ZaloUserProfile {
-    id: string;
-    name?: string;
-    avatar?: string;
-    phone?: string;
-    default_address?: string;
-    updated_at?: string;
-}
+export type { ZaloUserProfile, UpdateProfileRequest } from "@/types/auth";
 
 export async function updateProfile(profile: Partial<ZaloUserProfile>): Promise<ZaloUserProfile> {
     if (!isSupabaseConfigured) {
@@ -234,6 +228,12 @@ export function setLoggedIn(value: boolean) {
 
 export async function logout() {
     setLoggedIn(false);
+    try {
+        localStorage.removeItem("zma_user_id");
+    } catch { }
+    if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("user-updated"));
+    }
 }
 
 export function useAuthStatus(): boolean {
@@ -249,7 +249,7 @@ export function useAuthStatus(): boolean {
 export async function autoLoginAndUpsert(): Promise<ZaloUserProfile | undefined> {
     if (!isSupabaseConfigured) return undefined;
 
-    const ui = await getUserInfo({ avatarType: "normal" });
+    const ui = await getUserInfo({ avatarType: "normal", autoRequestPermission: true });
     let phone: string | undefined;
     try {
         const pn = await getPhoneNumber();

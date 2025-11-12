@@ -10,11 +10,19 @@ import OrderTrackingPage from "@/pages/profile/order-tracking";
 import AccountInfoPage from "@/pages/profile/account-info";
 import SearchPage from "@/pages/search";
 import CheckoutPage from "@/pages/checkout";
+import LoginPage from "@/pages/login";
 import { createBrowserRouter } from "react-router-dom";
 import { getBasePath } from "@/utils/zma";
 
 const router = createBrowserRouter(
   [
+    {
+      path: "/login",
+      element: <LoginPage />,
+      handle: {
+        title: "Đăng nhập",
+      },
+    },
     {
       path: "/",
       element: <Layout />,

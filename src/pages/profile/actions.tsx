@@ -1,44 +1,8 @@
 import { OrderHistoryIcon, PackageIcon, ProfileIcon } from "@/components/vectors";
-import { useToBeImplemented } from "@/hooks";
-import { supabase, isSupabaseConfigured } from "@/lib/supabase";
-import { getUserInfo, getPhoneNumber } from "zmp-sdk";
 import { useNavigate } from "react-router-dom";
 
 export default function ProfileActions() {
-  const toBeImplemented = useToBeImplemented();
   const navigate = useNavigate();
-  const login = async () => {
-    try {
-      const user = await getUserInfo({ avatarType: "normal" });
-      let phone: string | undefined;
-      try {
-        const pn = await getPhoneNumber();
-        phone = pn.number;
-      } catch { }
-
-      if (!isSupabaseConfigured) {
-        alert("Thiếu cấu hình Supabase (.env)");
-        return;
-      }
-
-      await supabase.from("users").upsert(
-        [
-          {
-            id: user.userInfo.id,
-            name: user.userInfo.name,
-            avatar: user.userInfo.avatar,
-            phone: phone,
-            updated_at: new Date().toISOString(),
-          },
-        ],
-        { onConflict: "id" }
-      );
-      alert("Đăng nhập thành công");
-    } catch (e) {
-      console.error(e);
-      alert("Đăng nhập thất bại");
-    }
-  };
 
   return (
     <div className="bg-white rounded-xl p-4 border border-black/10 shadow-sm">
